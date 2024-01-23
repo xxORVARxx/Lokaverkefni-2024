@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tímarit</title>
+    <!--link rel="stylesheet" href="./style.css"-->
+    <!--link rel="icon" href="./favicon.ico" type="image/x-icon"-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <style>
+        h1 {
+            padding: 50px 100px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 0.7fr 1fr 1fr 1.3fr;
+            gap: 5px 50px;
+            /*background-color: #2196F3;*/
+            padding: 50px 100px;
+        }
+        .grid-container > div {
+            display: flex; /* or inline-flex */
+            flex-direction: column; /* row | row-reverse | column | column-reverse */
+            gap: 10px;
+            /*background-color: rgba(255, 255, 255, 0.8);*/
+            text-align: center;
+            font-size: 18px;
+        }
+        .grid-container > div > span {
+            text-align: left;
+            font-size: 12px;
+        }
+        #bil {
+            /*height: 300px;*/
+        }
+        canvas {
+            margin-bottom: 300px;
+        }
+    </style>
+  </head>
+  <body>
+    <main>
+        <h1>Örvar Sigþórsson - Diplóma í rafiðnfræði - Lokaverkefni 2024</h1>
+        <div class="grid-container">
+            <div id="skil">
+                Skil:
+            </div>
+            <div id="skyrsla">
+                Skýrslan:
+            </div>
+            <div id="verkefni">
+                Tilraunaverkefnið:
+            </div>
+            <div id="hugtok">
+                [24] Heimildir leit og hugtök:
+            </div>
+        </div>
+
+	<div id="bil"></div>
+
+        <h1>Verkáætlun fyrir lokaverkefni</h1>
+        <canvas id="linurit",  style="width:100%; max-height: 30px;"></canvas>
+    </main>
+
+	<script>
+        const _COLORS = {
+            red: 'rgb(255, 99, 132)',
+            orange: 'rgb(255, 159, 64)',
+            yellow: 'rgb(255, 205, 86)',
+            green: 'rgb(75, 192, 192)',
+            blue: 'rgb(54, 162, 235)',
+            purple: 'rgb(153, 102, 255)',
+            grey: 'rgb(201, 203, 207)'
+        };
+
+        const _SW = -2.0; // Starting week.
+        const _EW = 21.0; // Last week.
+        const _PX = 25; // Hight per row.
+        let _COUNTER = 0; // heimildir.
+        function _DAY(day){
+            return 0.14286 * day;
+        }
+
+
+
+        const concepts = [
+            "Skilgreining á kerfum.",
+            "Skilgreining á iðnstýringum.",
+            "Skilgreining á iðntölvum.",
+            "Skilgreining á skjámyndakerfum.",
+            "Skilgreining áGNU/Linux og RPi (Raspberry Pi) smátölvum.",
+            "Skilgreining á HTML (HyperText Markup Language).",
+            "Skilgreining á CSS (Cascading Style Sheets; oft kallað stílsnið).",
+            "Skilgreining á JS (JavaScript).",
+            "Skilgreining á vefþjóni (backend eða bakendi).",
+            "Skilgreining á AWS (Amazon Web Services) og Supabase.",
+            "Skilgreining á vefsíðu (frontend eða framendi).",
+            "Skilgreining á gagnagrunni (Database eða DB).",
+            "Skilgreining á vafra (web-browser).",
+            "Vitna í Mozilla(Firefox), Google(Chrome), Brave eða KDE(Konqueror).",
+            "Skilgreining á HTTP/HTTPS (Hypertext Transfer Protocol /Secure).",
+            "Skilgreining á IoT (The Internet of Things) og MQTT (the standard for IoT messaging).",
+            "Skilgreining á TLS (Transport Layer Security, líka kallað SSL).",
+            "Skilgreining á SVG (Scalable Vector Graphics) og tengingunni við HTML og vafra.",
+            "Skilgreining á Inkscape (vector graphics editor).",
+            "Hvernig nýtist LHTTP safn þegar sett er upp á Siemens Iðntölvu?",
+            "Skilgreining á SCADA staðlinum.",
+        ];
+
+        const toDo = [
+            [0, 3.0, 1.5, 'Velja leið - Siemens', 'Bera saman leiðir og velja ódýrustu leiðina sem Siemens býður upp á til að fjartengjast skjámyndakerfum. Skrifa punkta.'],
+            [0, -1.0, 2.0, 'Kostnaðaráætlun - Siemens', 'Útbúa einhverskonar kostnaðaráætlun byggða á Siemens.'],
+            [0, -0.5, 1.5, 'Heimildaleit - Siemens', 'Skoða heimasíðu Siemens vandlega og skrifa texta.'],
+            [0, 0.0, 2.0, 'Heimildaleit - Ský og Firebase', 'Skoða og taka saman upplýsingar um skýjaþjónustur sem og Firebase.'],
+            [0, -1.0, 1.0, 'Heimildaleit - mySCADA', 'Finna upplýsingar og athuga verð fyrir sambærilega aðferð og valin var hjá Siemens. Skrifa punkta.'],
+            [0, 0.0, 2.0, 'Skipulag skýrslu', 'Ákveða hvaða efni á að vera til umfjöllunar í 1. inngangi, í 2. meginmál eða í 2.5 tilraunaverkefnið.'],
+            [0, 0.0, 4.0, 'Tilraunaverkefnið', 'Byrja á texta um tilraunaverkefnið.'],
+            [0, -2.0, 2.0, 'Lokaorð og samantekt', 'Skrifa lokaorð og samantekt.'],
+            [0, -1.0, 2.0, 'Formáli og inngangur', 'Skrifa formála og inngang.'],
+            [0, -4.0, 6.0, 'Samstilling', 'Samstilla og yfirfara allan texta sem kominn er.'],
+            [0, -1.0, 2.0, 'Heimildaskrá og almennur frágangur', 'Yfirfara heimildaskrá og yfirfara skýrslu í heild.'],
+
+            [1, 0.0, 2.0, 'Upplýsingasöfnun - Smith og Norland', 'Hafa samband við Smith og Norland sem er umboðsaðili fyrir Siemens og fá verð á iðntölvum og leyfum.'],
+            [1, -1.5, 3.0, 'Upplýsingasöfnun - Siemens', 'Setja upp TIA Portal og skoða leiðir sem eru í boði.'],
+            [1, -1.0, 1.0, 'Útvega leyfi', 'Útvega leyfi fyrir TIA sem og iðntölvu sem hentar fyrir verkefnið.'],
+            [1, -1.5, 0.5, 'Setja upp Raspberry Pi', 'Setja upp RPi svo hægt sé að prófa ýmsar aðferðir til að tengjast iðntölvunni.'],
+            [1, 4.0, 2.5, 'Upplýsingaöflun - Vefþjón', 'Skoða hvaða þjónustur bjóða upp á vefþjón á skýi.'],
+            [1, -1.5, 1.5, 'Upplýsingaöflun - HTTPS samskipti', 'Skoða HTTP samskipti sem og aðrar samskiptaaðferðir til samanburðar (IoT/MQTT).'],
+            [1, 0.0, 1.0, 'Upplýsingaöflun - Andor ehf', 'Fá verð og hugmyndir frá Andor ehf varðandi mySCADA.'],
+            [1, -0.5, 1.0, 'Upplýsingaöflun - mySCADA', 'Skoða framboðið hjá mySCADA.'],
+            [1, 0.25, 2.25, 'Útfæra samskiptaleið', 'Koma upp samskiptaleið á milli RPi og iðntölvunnar.'],
+            [1, 0.5, 2.5, 'Upplýsingaöflun - HTTPS/OAuth', 'Skoða HTTPS/OAuth og finna leið til að koma upp öruggari tengingu fyrir veraldarvefinn.'],
+            [1, -1.0, 2.0, 'Færa samskipti yfir á vefþjónn', 'Færa samskipti af RPi og yfir á vefþjón.'],
+            [1, -0.25, 2.0, 'Útbúa viðauka', 'Taka saman og útbúa dæmi sem fara í viðauka, t.d. LHTTP og MQTT í TIA Portal.'],
+        ];
+        const labels = [];
+        toDo.forEach((text, i) => labels.push(`${text[3]} [${i+1}]`));
+
+        const durations = [];
+        const durations2 = [];
+        for(let curr = [_SW, _SW,], i = 0; i < labels.length; i++) {
+            let begin = curr[toDo[i][0]] + toDo[i][1];
+            let end = begin + toDo[i][2];
+            curr[toDo[i][0]] = end;
+            //console.log("B:", begin, " E:", end, " C:", curr[toDo[i][0]], " i: ", toDo[i][0]);
+            durations.push([begin, end]); durations2.push([0, 0]);
+        }
+
+        _COUNTER = labels.length;
+        durations.push([1, 13]); durations2.push([0, 0]);
+        labels.push(`Heimildaleit og hugtök (alls ${concepts.length} atriði) [${++_COUNTER}]`);
+        durations.push([9.0+_DAY(2), 10.0+_DAY(2)]); durations2.push([7.5-_DAY(2), 9.0+_DAY(2)]);
+        labels.push("Undirbúa vörn");
+
+
+
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Tímaspan',
+                data: durations,
+                borderSkipped: false,
+                borderWidth: 3,
+                borderRadius: 8,
+                borderColor: 'rgb(153, 102, 255)',
+                backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                barPercentage: 1.0,
+            },
+            {
+                label: 'Tímaspan2',
+                data: durations2,
+                borderSkipped: false,
+                borderWidth: 3,
+                borderRadius: 8,
+                borderColor: 'rgb(153, 102, 255)',
+                backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                barPercentage: 1.0,
+            }],
+        };
+
+
+
+        const deadlines = [
+            [0, 0, "Umsókn um lokaverkefni",              "Fylla inn umsókn um lokaverkefni (15. desember 2023)."],
+            [0, 0, "Uppsetning skýrslu og verkáætlun",    "a) Setja upp skýrslu og ákveða kaflaskiptingu. b) Útbúa Gantt rit og skipuleggja tíma (22. janúar)."],
+            [0, 0, "IEEE heimildanotkun fyrirlestur",     "Fyrirlestur frá skólanum um IEEE heimildanotkun (26. janúar - 1 klst 12:00-13:00)."],
+            [0, 0, "Fyrri áfangaskil",                    "Vera búinn að vinna í gegnum kaflana í meginmáli (12. febrúar)."],
+            [0, 0, "Seinni áfangaskil",                   "Fræðin og undirbúningur fyrir úrvinnslu á mælingum og/eða gögnum á að liggja að mestu fyrir í skýrslunni (26. febrúar)."],
+            [0, 0, "Miðannarvörn á seinni skilum",        "Kynning + powerpoint og spurningar frá kennara (4. mars - 8. mars )."],
+            [0, 0, "Lokaskil",                            "Lokaskil, hér á skýslan að vera full búin (22. apríl)."],
+            [0, 0, "Varnir á lokaverkefni",               "Varnir á lokaverkefni, upplýsingar koma seinna (miðjan maí)."],
+            [0, 0, "Skil á skýrslu inn á skemma.is",      "Skil á skýrslu inn á skemma.is eftir vörn, áfanga lokið!"],
+        ];
+        deadlines.forEach(function(item){
+            item[2] = `${item[2]} [${++_COUNTER}]`;
+            item[3] = `[${_COUNTER}] ${item[3]}`; 
+        });
+        function getLine(at, text, pos, color){
+            return {
+                type: 'line',
+                xMin: at,
+                xMax: at,
+                borderColor: color,
+                borderWidth: 3,
+                label: {
+                    backgroundColor: color,
+                    content: text,
+                    display: true,
+                    position: pos, // start | center | end
+                    rotation: 90,
+                },
+            };
+        }
+
+
+
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    x: {
+                        min: _SW,
+                        max: _EW,
+                        stacked: true,
+                        ticks: {
+                            stepSize: 1,
+                        },
+                        title: {
+                            display: true,
+                            text: 'Vikur',
+                            font: {
+                                size: 18,
+                                weight: 'bolder',
+                            },
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                    },
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                        position: 'top',
+                    },
+                    title: {
+                        display: false,
+                        text: 'Verkáætlun fyrir lokaverkefni',
+                        font: {
+                            size: 32,
+                        },
+                    },
+                    annotation: {
+                        annotations: {
+                            line0: getLine(1.0, "Gleðilegt nýtt ár 2024!", 'center', 'gray'), // 01jan/00+0
+                            line1: getLine(-2.0+_DAY(4), deadlines[0][2], 'center', 'green'), // 15des/11+4
+                            line2: getLine(4.0, deadlines[1][2], 'center', 'green'), // 22des/04+0
+                            line3: getLine(4.0+_DAY(4), deadlines[2][2], 'center', 'gray'), // 26jan/04+4
+                            line4: getLine(7.0, deadlines[3][2], 'center', 'red'), // 12feb/07+0
+                            line5: getLine(9.0, deadlines[4][2], 'center', 'red'), // 26feb/09+0
+                            line6: getLine(10.0+_DAY(2), deadlines[5][2], 'center', 'red'), // 04mar/10+2
+                            line7: getLine(17.0, deadlines[6][2], 'center', 'red'), // 22apr/17+0
+                            line8: getLine(19.0+_DAY(4), deadlines[7][2], 'center', 'red'), // 10maí/19+4
+                            line9: getLine(20.0+_DAY(2), deadlines[8][2], 'center', 'red'), // 15maí/20+2
+                        },
+                    },
+                }
+            }
+        };
+        // Setja upp línuritið:
+        const canvas = document.getElementById('linurit');
+        canvas.style.maxHeight = `${30 * _PX}px`;
+        const linurit = new Chart(canvas, config);
+        linurit.update();
+
+
+
+        // HTML:
+        const nodeSkil = document.getElementById("skil");
+        const nodeSkyrsla = document.getElementById("skyrsla");
+        const nodeVerkefni = document.getElementById("verkefni");
+        const nodeHugtok = document.getElementById("hugtok");
+
+        deadlines.forEach(function(item, i){
+            const node = document.createElement('span');
+            const textnode = document.createTextNode(item[3]);
+            node.appendChild(textnode);
+            nodeSkil.appendChild(node);
+        });
+
+        toDo.forEach(function(item, i){
+            const node = document.createElement('span');
+            const textnode = document.createTextNode(`[${i+1}] ${item[4]}`);
+            node.appendChild(textnode);
+            if(item[0] === 0){
+                nodeSkyrsla.appendChild(node);
+            }
+            else if(item[0] === 1){
+                nodeVerkefni.appendChild(node);
+            }
+        });
+
+        concepts.forEach(function(item, i){
+            const node = document.createElement('span');
+            const textnode = document.createTextNode((i+1) +". "+ item);
+            node.appendChild(textnode);
+            nodeHugtok.appendChild(node);
+        });
+
+    </script>
+  </body>
+</html>
