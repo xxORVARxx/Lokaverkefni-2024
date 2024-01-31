@@ -33,7 +33,7 @@
             font-size: 12px;
         }
         #bil {
-            /*height: 300px;*/
+            height: 30px;
         }
         canvas {
             margin-bottom: 300px;
@@ -65,6 +65,7 @@
     </main>
 
 	<script>
+        // -- Global variables --
         const _COLORS = {
             red: 'rgb(255, 99, 132)',
             orange: 'rgb(255, 159, 64)',
@@ -74,17 +75,64 @@
             purple: 'rgb(153, 102, 255)',
             grey: 'rgb(201, 203, 207)'
         };
-
         const _SW = -2.0; // Starting week.
         const _EW = 21.0; // Last week.
-        const _PX = 25; // Hight per row.
-        let _COUNTER = 0; // heimildir.
+        const _PX = 35; // Hight per row.
         function _DAY(day){
             return 0.14286 * day;
         }
 
 
+        function getScalesManager(_length, _startPoint = 1.0, _resolution = 'none'){
+            // Private variables:
+            const scales = {
+                'year': [12, 1],
+                'weeks': [52, 1],
+                'week': [7, 1],
+                'day': [24, 0],
+                'hour': [60, 0],
+                'minute': [60, 0],
+                'second': [60, 0],
+                'degrees': [360, 0],
+                // default: [null, 0],
+            };
+            const min = 0.0;
+            const max = _length;
+            let startPoint = _startPoint;
+            const resolution = scales[_resolution][0] || null;
+            const zeroOrOne = scales[_resolution][1] || 0;
+            // Constructor:
+            (() => {
+                // ...
+            })(); 
+            // Private methods:
+            function ifNegativeNumbers(num){
+                if(resolution && num < 0.0){
+                    num = resolution + num;
+                }
+                return num;
+            }
+            // Public interface:
+            return {
+                getMin(){
+                    return Math.ceil(min);
+                },
+                getMax(){
+                    return Math.ceil(max);
+                },
+                getScale(){
+                    return -startPoint;
+                },
+                scaleCallback(x){
+                    return (ifNegativeNumbers(startPoint + x) % resolution) + zeroOrOne;
+                },
+            };
+        };
+        const sM = getScalesManager(25, -3, 'weeks');
 
+
+
+        // -- Texti fyrir 'hugtok' --
         const concepts = [
             "Skilgreining á kerfum.",
             "Skilgreining á iðnstýringum.",
@@ -109,32 +157,267 @@
             "Skilgreining á SCADA staðlinum.",
         ];
 
-        const toDo = [
-            [0, 3.0, 1.5, 'Velja leið - Siemens', 'Bera saman leiðir og velja ódýrustu leiðina sem Siemens býður upp á til að fjartengjast skjámyndakerfum. Skrifa punkta.'],
-            [0, -1.0, 2.0, 'Kostnaðaráætlun - Siemens', 'Útbúa einhverskonar kostnaðaráætlun byggða á Siemens.'],
-            [0, -0.5, 1.5, 'Heimildaleit - Siemens', 'Skoða heimasíðu Siemens vandlega og skrifa texta.'],
-            [0, 0.0, 2.0, 'Heimildaleit - Ský og Firebase', 'Skoða og taka saman upplýsingar um skýjaþjónustur sem og Firebase.'],
-            [0, -1.0, 1.0, 'Heimildaleit - mySCADA', 'Finna upplýsingar og athuga verð fyrir sambærilega aðferð og valin var hjá Siemens. Skrifa punkta.'],
-            [0, 0.0, 2.0, 'Skipulag skýrslu', 'Ákveða hvaða efni á að vera til umfjöllunar í 1. inngangi, í 2. meginmál eða í 2.5 tilraunaverkefnið.'],
-            [0, 0.0, 4.0, 'Tilraunaverkefnið', 'Byrja á texta um tilraunaverkefnið.'],
-            [0, -2.0, 2.0, 'Lokaorð og samantekt', 'Skrifa lokaorð og samantekt.'],
-            [0, -1.0, 2.0, 'Formáli og inngangur', 'Skrifa formála og inngang.'],
-            [0, -4.0, 6.0, 'Samstilling', 'Samstilla og yfirfara allan texta sem kominn er.'],
-            [0, -1.0, 2.0, 'Heimildaskrá og almennur frágangur', 'Yfirfara heimildaskrá og yfirfara skýrslu í heild.'],
+        // -- Texti fyrir 'skil' --
+        const deadlines = [
+            // deadlines[i][0]=Tímin.
+            // deadlines[i][1]=Ónotað.
+            // deadlines[i][2]=Stutt lýsing (fer á línuna á ritinu).
+            // deadlines[i][3]=Nákvæmari lýsing.
+            [0, 0, "Umsókn um lokaverkefni",              "Fylla inn umsókn um lokaverkefni (15. desember 2023)."],
+            [0, 0, "Uppsetning skýrslu og verkáætlun",    "a) Setja upp skýrslu og ákveða kaflaskiptingu. b) Útbúa Gantt rit og skipuleggja tíma (22. janúar)."],
+            [0, 0, "IEEE heimildanotkun fyrirlestur",     "Fyrirlestur frá skólanum um IEEE heimildanotkun (26. janúar - 1 klst 12:00-13:00)."],
+            [0, 0, "Fyrri áfangaskil",                    "Vera búinn að vinna í gegnum kaflana í meginmáli (12. febrúar)."],
+            [0, 0, "Seinni áfangaskil",                   "Fræðin og undirbúningur fyrir úrvinnslu á mælingum og/eða gögnum á að liggja að mestu fyrir í skýrslunni (26. febrúar)."],
+            [0, 0, "Miðannarvörn á seinni skilum",        "Kynning + powerpoint og spurningar frá kennara (4. mars - 8. mars )."],
+            [0, 0, "Lokaskil",                            "Lokaskil, hér á skýslan að vera full búin (22. apríl)."],
+            [0, 0, "Varnir á lokaverkefni",               "Varnir á lokaverkefni, upplýsingar koma seinna (miðjan maí)."],
+            [0, 0, "Skil á skýrslu inn á skemma.is",      "Skil á skýrslu inn á skemma.is eftir vörn, áfanga lokið!"],
+    ];
 
-            [1, 0.0, 2.0, 'Upplýsingasöfnun - Smith og Norland', 'Hafa samband við Smith og Norland sem er umboðsaðili fyrir Siemens og fá verð á iðntölvum og leyfum.'],
-            [1, -1.5, 3.0, 'Upplýsingasöfnun - Siemens', 'Setja upp TIA Portal og skoða leiðir sem eru í boði.'],
-            [1, -1.0, 1.0, 'Útvega leyfi', 'Útvega leyfi fyrir TIA sem og iðntölvu sem hentar fyrir verkefnið.'],
-            [1, -1.5, 0.5, 'Setja upp Raspberry Pi', 'Setja upp RPi svo hægt sé að prófa ýmsar aðferðir til að tengjast iðntölvunni.'],
-            [1, 4.0, 2.5, 'Upplýsingaöflun - Vefþjón', 'Skoða hvaða þjónustur bjóða upp á vefþjón á skýi.'],
-            [1, -1.5, 1.5, 'Upplýsingaöflun - HTTPS samskipti', 'Skoða HTTP samskipti sem og aðrar samskiptaaðferðir til samanburðar (IoT/MQTT).'],
-            [1, 0.0, 1.0, 'Upplýsingaöflun - Andor ehf', 'Fá verð og hugmyndir frá Andor ehf varðandi mySCADA.'],
-            [1, -0.5, 1.0, 'Upplýsingaöflun - mySCADA', 'Skoða framboðið hjá mySCADA.'],
-            [1, 0.25, 2.25, 'Útfæra samskiptaleið', 'Koma upp samskiptaleið á milli RPi og iðntölvunnar.'],
-            [1, 0.5, 2.5, 'Upplýsingaöflun - HTTPS/OAuth', 'Skoða HTTPS/OAuth og finna leið til að koma upp öruggari tengingu fyrir veraldarvefinn.'],
-            [1, -1.0, 2.0, 'Færa samskipti yfir á vefþjónn', 'Færa samskipti af RPi og yfir á vefþjón.'],
-            [1, -0.25, 2.0, 'Útbúa viðauka', 'Taka saman og útbúa dæmi sem fara í viðauka, t.d. LHTTP og MQTT í TIA Portal.'],
-        ];
+
+        function getLabelsAndDataManager(){
+            // Private variables:
+            let countReferences = 0;
+            let layerDepth = 0;
+            const labelsText = [];
+            const labelsPos = [];
+            const texts = [];
+            const groups = {};
+            const colors = [
+                [],
+            ];
+            const durations = [
+                [],
+            ];
+            // Constructor:
+            // Private methods:
+            function calcBeginAndEnd(groupID, move, duration, depth = 0){
+                // If the groupID is undefined, use zero (new group is being declared).
+                const group_position = groups[groupID] > 0.0 ? groups[groupID] : 0.0;
+                //console.log("calcBeginAndEnd(groupID=", groupID, ", move=",  move, ", duration=", duration, ", depth=", depth, ");");
+
+                let begin, end;
+
+
+
+                begin = /*group_position +*/ move;
+                end = begin + duration;
+                labelsPos.push(end);
+                groups[groupID] = end;
+                //console.log("  depth = 0    ->     ", labelsPos, groups);
+
+
+
+                /*
+                if(depth === 0){
+                    // this is the first 'duration' added to this lable.
+                    begin = group_position + move;
+                    end = begin + duration;
+                    labelsPos.push(end);
+                    groups[groupID] = end;
+                    console.log("  depth = 0    ->     ", labelsPos, groups);
+                }
+                else{
+                    
+                    // If 'group_position' is behind 'label_position': then use 'label_position',
+                    // but if 'group_position' is further ahead; then use 'group_position'.
+                    const label_position = labelsPos[labelsPos.length-1];
+                    // If this is not the first 'duration', negative position is not possible,
+                    // because this 'duration' begins where the last one ended.
+                    const pos = Math.max(label_position, group_position);
+                    begin = Math.max(pos, pos + move);
+
+                    
+                    //const pos = Math.max(0.0, group_position - label_position); //<-Not accepting a number below zero.
+                    //begin = Math.max(0.0, pos + move); //<-Not accepting a number below zero.
+                    
+
+                    
+
+                    labelsPos[labelsPos.length-1] += end;
+                    groups[groupID] += end;
+                    console.log("  depth > 0    ->     ", labelsPos, groups);
+                }
+                */
+                //console.log("     [begin, end] -> ", [begin, end], "\n");
+                return [begin, end];
+            }
+            function fillLayers(){
+                durations.forEach( layer => {
+                    while(durations[0].length > layer.length + 1){
+                        layer.push([0.0, 0.0]);
+                    }
+                });
+                colors.forEach( layer => {
+                    while(colors[0].length > layer.length + 1){
+                        layer.push("");
+                    }
+                });
+            }
+
+            // Public interface:
+            return {
+                add(groupID, color, move, duration, label, text, withReference = true){
+                    // Using the JS 'Destructuring assignment' syntax:
+                    //const [begin, end] = calcBeginAndEnd(groupID, move, duration);
+
+                    durations[0].push( calcBeginAndEnd(groupID, move, duration) );
+                    colors[0].push(color);
+
+                    ++countReferences;
+                    labelsText.push(withReference ? `${label} [${countReferences}]` : label);
+                    texts.push(withReference ? `[${countReferences}] ${text}` : text);
+
+                    fillLayers();
+                    let depth = 1;
+                    return {
+                        // The 'add' function returns another function named 'addLayer',
+                        // 'addLayer' will add another 'duration' to the same label.
+                        // NOTE: This tow functions can be chained:  .add(s,s,f,f,s,s,/b).addLayer(s,s,f,f);
+                        addLayer(groupID, color, move, duration){
+                            if(durations[depth]) {
+                                console.log("Depth already exists.");
+                            }
+                            else{
+                                console.log("Make new depth.");
+                                durations.push([]);
+                                colors.push([]);
+                                fillLayers(); // Fill the column with zero-duration, until it's at the current label.
+                            }
+                            durations[depth].push( calcBeginAndEnd(groupID, move, duration, depth) );
+                            colors[depth].push(color);
+
+                            ++depth;
+                            return this;
+                            // The 'addLayer' function returns itself, so it can be chained,
+                            // like so:  .add(s,s,f,f,s,s,/b).addLayer(s,s,f,f).addLayer(s,s,f,f).addLayer(s,s,f,f);
+                        },
+                    };
+                    // Now to explain these two functions, 'add' and 'addLayer': (they both add a 'duration' to the chart)
+                    // 'add' is used to add a row to the to the first column, each row has a corresponding label.
+                    // 'addLayer' will add a column and place the 'duration' at the current row.
+                    // 'depth' is the number of columns the chart has.
+                },
+                getReferenceCount(){
+                    return countReferences;
+                },
+                getLabels(){
+                    return labelsText;
+                },
+                getTexts(){
+                    return texts;
+                },
+                scaleData(scale){
+                    for(let i = 0; i < durations[0].length ; ++i){
+                        durations[0][i][0] += scale;
+                        durations[0][i][1] += scale;
+                    }
+                },
+                getChartData(borderWidth, borderRadius, barPercentage, opacity){
+                    // the function will generate the data for the chart.
+                    const dataSets = [];
+                    for( let i = 0; i < durations.length ; ++i){
+                        dataSets.push({
+                            label: "Tímaspan " + (i+1),
+                            data: durations[i],
+                            borderSkipped: false,
+                            borderWidth: borderWidth,
+                            borderRadius: borderRadius,
+                            borderColor: colors[i],
+                            backgroundColor: colors[i], // <- Fix here.... opacity
+                            barPercentage: barPercentage,
+                        });
+                    }
+                    return {
+                        // Chart-JS will use this object.
+                        labels: labelsText,
+                        datasets: dataSets,
+                    }
+                },
+            };
+        };
+        const ldM = getLabelsAndDataManager();
+        
+        // -- Texti fyrir 'Skýrslan' og 'verkefni' --
+        // 1. argument = Framhal af tímanum fyrir ofan.        
+        // 2. argument = Litur timabilsins á línuritinu.
+        // 3. argument = Byrjun tímabils(0 er endir timabilsins á undan).
+        // 4. argument = Lengd tímabils.
+        // 5. argument = Stutt lýsing.
+        // 6. argument = Nákvæmari lýsing.
+        /*
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', 1.0, 1.5, 'Velja leið - Siemens', 'Bera saman leiðir og velja ódýrustu leiðina sem Siemens býður upp á til að fjartengjast skjámyndakerfum. Skrifa punkta.');
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0, 'Kostnaðaráætlun - Siemens', 'Útbúa einhverskonar kostnaðaráætlun byggða á Siemens.');
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', -0.5, 1.5, 'Heimildaleit - Siemens', 'Skoða heimasíðu Siemens vandlega og skrifa texta.')
+        .addLayer('na', 'rgb(4, 2, 135)', 1.0, 1.5)
+        .addLayer('na', 'rgb(4, 2, 135)', 1.0, 1.5)
+        .addLayer('na', 'rgb(200, 2, 5)', 1.0, 1.5);
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', 0.0, 2.0, 'Heimildaleit - Ský og Firebase', 'Skoða og taka saman upplýsingar um skýjaþjónustur sem og Firebase.');
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', -1.0, 1.0, 'Heimildaleit - mySCADA', 'Finna upplýsingar og athuga verð fyrir sambærilega aðferð og valin var hjá Siemens. Skrifa punkta.')
+        .addLayer('na', 'rgb(200, 2, 5)', 1.0, 1.5);
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', 0.0, 2.0, 'Skipulag skýrslu', 'Ákveða hvaða efni á að vera til umfjöllunar í 1. inngangi, í 2. meginmál eða í 2.5 tilraunaverkefnið.');
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', 0.0, 4.0, 'Tilraunaverkefnið', 'Byrja á texta um tilraunaverkefnið.');
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', -2.0, 2.0, 'Lokaorð og samantekt', 'Skrifa lokaorð og samantekt.');
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0, 'Formáli og inngangur', 'Skrifa formála og inngang.');
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', -4.0, 6.0, 'Samstilling', 'Samstilla og yfirfara allan texta sem kominn er.');
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0, 'Heimildaskrá og almennur frágangur', 'Yfirfara heimildaskrá og yfirfara skýrslu í heild.');
+
+        ldM.add('verkefni', 'rgb(153, 102, 255)', -2.0, 2.0, 'Upplýsingasöfnun - Smith og Norland', 'Hafa samband við Smith og Norland sem er umboðsaðili fyrir Siemens og fá verð á iðntölvum og leyfum.');
+        ldM.add('verkefni', 'rgb(153, 102, 255)', -1.5, 3.0, 'Upplýsingasöfnun - Siemens', 'Setja upp TIA Portal og skoða leiðir sem eru í boði.');
+        ldM.add('verkefni', 'rgb(153, 102, 255)', -1.0, 1.0, 'Útvega leyfi', 'Útvega leyfi fyrir TIA sem og iðntölvu sem hentar fyrir verkefnið.');
+        ldM.add('verkefni', 'rgb(153, 102, 255)', -1.5, 0.5, 'Setja upp Raspberry Pi', 'Setja upp RPi svo hægt sé að prófa ýmsar aðferðir til að tengjast iðntölvunni.');
+        ldM.add('verkefni', 'rgb(153, 102, 255)', 4.0, 2.5, 'Upplýsingaöflun - Vefþjón', 'Skoða hvaða þjónustur bjóða upp á vefþjón á skýi.');
+        ldM.add('verkefni', 'rgb(153, 102, 255)', -1.5, 1.5, 'Upplýsingaöflun - HTTPS samskipti', 'Skoða HTTP samskipti sem og aðrar samskiptaaðferðir til samanburðar (IoT/MQTT).');
+        ldM.add('verkefni', 'rgb(153, 102, 255)', 0.0, 1.0, 'Upplýsingaöflun - Andor ehf', 'Fá verð og hugmyndir frá Andor ehf varðandi mySCADA.');
+        ldM.add('verkefni', 'rgb(153, 102, 255)', -0.5, 1.0, 'Upplýsingaöflun - mySCADA', 'Skoða framboðið hjá mySCADA.');
+        ldM.add('verkefni', 'rgb(153, 102, 255)', 0.25, 2.25, 'Útfæra samskiptaleið', 'Koma upp samskiptaleið á milli RPi og iðntölvunnar.');
+        */
+        ldM.add('verkefni', 'rgb(153, 102, 255)', 0.5, 2.5, 'Upplýsingaöflun - HTTPS/OAuth', 'Skoða HTTPS/OAuth og finna leið til að koma upp öruggari tengingu fyrir veraldarvefinn.');
+        ldM.add('verkefni', 'rgb(153, 102, 255)', 1.0, 2.0, 'Færa samskipti yfir á vefþjónn', 'Færa samskipti af RPi og yfir á vefþjón.');
+        ldM.add('verkefni', 'rgb(153, 102, 255)', -0.25, 2.0, 'Útbúa viðauka', 'Taka saman og útbúa dæmi sem fara í viðauka, t.d. LHTTP og MQTT í TIA Portal.');
+
+        ldM.add('hugtok', 'rgb(153, 102, 255)', -1.4, 0.6, `Heimildaleit og hugtök (alls ${concepts.length} atriði)`, '')
+        .addLayer('hugtok', 'rgb(1, 102, 255)', 0.2, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.2, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.2, 0.6);/*
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6);
+*/
+        ldM.add('vorn', 'rgb(153, 102, 255)', 1.0, 10.0, 'Undirbúa vörn', '', false)
+        .addLayer('vorn', 'rgb(153, 102, 255)', 6.0+_DAY(4), 2.0);
+
+        //sM.ScaleData(ldM.getData());
+        ldM.scaleData(sM.getScale());
+        const data = ldM.getChartData( 3.0, 8.0, 1.0, 1.0);
+        
+
+
+
+/*
+        
+        manager.addLabel(`Heimildaleit og hugtök (alls ${concepts.length} atriði)`);
+        manager.addDuration('A', 1.0, 13,0, 'hugtok');
+        manager.addLabel("Undirbúa vörn", false);
+        manager.addDuration('A', 9.0+_DAY(2), 10.0+_DAY(2), 'vorn');
+        manager.addDuration('B', 7.5-_DAY(2), 9.0+_DAY(2), 'vorn');
+
+
+        // -- Vinsla á texti fyrir 'Skýrslan' og 'verkefni' --
         const labels = [];
         toDo.forEach((text, i) => labels.push(`${text[3]} [${i+1}]`));
 
@@ -153,49 +436,14 @@
         labels.push(`Heimildaleit og hugtök (alls ${concepts.length} atriði) [${++_COUNTER}]`);
         durations.push([9.0+_DAY(2), 10.0+_DAY(2)]); durations2.push([7.5-_DAY(2), 9.0+_DAY(2)]);
         labels.push("Undirbúa vörn");
+*/
 
 
-
-        const data = {
-            labels: labels,
-            datasets: [{
-                label: 'Tímaspan',
-                data: durations,
-                borderSkipped: false,
-                borderWidth: 3,
-                borderRadius: 8,
-                borderColor: 'rgb(153, 102, 255)',
-                backgroundColor: 'rgba(153, 102, 255, 0.5)',
-                barPercentage: 1.0,
-            },
-            {
-                label: 'Tímaspan2',
-                data: durations2,
-                borderSkipped: false,
-                borderWidth: 3,
-                borderRadius: 8,
-                borderColor: 'rgb(153, 102, 255)',
-                backgroundColor: 'rgba(153, 102, 255, 0.5)',
-                barPercentage: 1.0,
-            }],
-        };
-
-
-
-        const deadlines = [
-            [0, 0, "Umsókn um lokaverkefni",              "Fylla inn umsókn um lokaverkefni (15. desember 2023)."],
-            [0, 0, "Uppsetning skýrslu og verkáætlun",    "a) Setja upp skýrslu og ákveða kaflaskiptingu. b) Útbúa Gantt rit og skipuleggja tíma (22. janúar)."],
-            [0, 0, "IEEE heimildanotkun fyrirlestur",     "Fyrirlestur frá skólanum um IEEE heimildanotkun (26. janúar - 1 klst 12:00-13:00)."],
-            [0, 0, "Fyrri áfangaskil",                    "Vera búinn að vinna í gegnum kaflana í meginmáli (12. febrúar)."],
-            [0, 0, "Seinni áfangaskil",                   "Fræðin og undirbúningur fyrir úrvinnslu á mælingum og/eða gögnum á að liggja að mestu fyrir í skýrslunni (26. febrúar)."],
-            [0, 0, "Miðannarvörn á seinni skilum",        "Kynning + powerpoint og spurningar frá kennara (4. mars - 8. mars )."],
-            [0, 0, "Lokaskil",                            "Lokaskil, hér á skýslan að vera full búin (22. apríl)."],
-            [0, 0, "Varnir á lokaverkefni",               "Varnir á lokaverkefni, upplýsingar koma seinna (miðjan maí)."],
-            [0, 0, "Skil á skýrslu inn á skemma.is",      "Skil á skýrslu inn á skemma.is eftir vörn, áfanga lokið!"],
-        ];
+        
+        let refCount = ldM.getReferenceCount(); // heimildir.
         deadlines.forEach(function(item){
-            item[2] = `${item[2]} [${++_COUNTER}]`;
-            item[3] = `[${_COUNTER}] ${item[3]}`; 
+            item[2] = `${item[2]} [${++refCount}]`;
+            item[3] = `[${refCount}] ${item[3]}`; 
         });
         function getLine(at, text, pos, color){
             return {
@@ -225,11 +473,12 @@
                 maintainAspectRatio: true,
                 scales: {
                     x: {
-                        min: _SW,
-                        max: _EW,
+                        min: sM.getMin(),
+                        max: sM.getMax(),
                         stacked: true,
                         ticks: {
                             stepSize: 1,
+                            callback: sM.scaleCallback,
                         },
                         title: {
                             display: true,
@@ -238,7 +487,7 @@
                                 size: 18,
                                 weight: 'bolder',
                             },
-                        }
+                        },
                     },
                     y: {
                         stacked: true,
@@ -257,7 +506,7 @@
                         },
                     },
                     annotation: {
-                        annotations: {
+                        annotations: {/*
                             line0: getLine(1.0, "Gleðilegt nýtt ár 2024!", 'center', 'gray'), // 01jan/00+0
                             line1: getLine(-2.0+_DAY(4), deadlines[0][2], 'center', 'green'), // 15des/11+4
                             line2: getLine(4.0, deadlines[1][2], 'center', 'green'), // 22des/04+0
@@ -268,17 +517,16 @@
                             line7: getLine(17.0, deadlines[6][2], 'center', 'red'), // 22apr/17+0
                             line8: getLine(19.0+_DAY(4), deadlines[7][2], 'center', 'red'), // 10maí/19+4
                             line9: getLine(20.0+_DAY(2), deadlines[8][2], 'center', 'red'), // 15maí/20+2
-                        },
+                        */},
                     },
                 }
             }
         };
         // Setja upp línuritið:
         const canvas = document.getElementById('linurit');
-        canvas.style.maxHeight = `${30 * _PX}px`;
+        canvas.style.maxHeight = `${ldM.getLabels().length * _PX}px`;
         const linurit = new Chart(canvas, config);
         linurit.update();
-
 
 
         // HTML:
@@ -294,14 +542,17 @@
             nodeSkil.appendChild(node);
         });
 
-        toDo.forEach(function(item, i){
+        ldM.getTexts().forEach(function(text, i){
+            if(text === null || text.legend === 0){
+                return;
+            }
             const node = document.createElement('span');
-            const textnode = document.createTextNode(`[${i+1}] ${item[4]}`);
+            const textnode = document.createTextNode(`[${i+1}] ${text[4]}`);
             node.appendChild(textnode);
-            if(item[0] === 0){
+            if(text[0] === 'skyrsla'){
                 nodeSkyrsla.appendChild(node);
             }
-            else if(item[0] === 1){
+            else if(text[0] === 'verkefni'){
                 nodeVerkefni.appendChild(node);
             }
         });
