@@ -77,7 +77,7 @@
         };
         const _SW = -2.0; // Starting week.
         const _EW = 21.0; // Last week.
-        const _PX = 35; // Hight per row.
+        const _PX = 30; // Hight per row.
         function _DAY(day){
             return 0.14286 * day;
         }
@@ -128,7 +128,7 @@
                 },
             };
         };
-        const sM = getScalesManager(25, -3, 'weeks');
+        const sM = getScalesManager(23, -3, 'weeks');
 
 
 
@@ -190,56 +190,35 @@
                 [],
             ];
             // Constructor:
+            (() => {
+                // ...
+            })(); 
             // Private methods:
             function calcBeginAndEnd(groupID, move, duration, depth = 0){
-                // If the groupID is undefined, use zero (new group is being declared).
-                const group_position = groups[groupID] > 0.0 ? groups[groupID] : 0.0;
-                //console.log("calcBeginAndEnd(groupID=", groupID, ", move=",  move, ", duration=", duration, ", depth=", depth, ");");
+                // If the groupID is undefined, use zero and a new group is declared.
+                const group_position = groupID in groups ? groups[groupID] : 0.0;
 
                 let begin, end;
-
-
-
-                begin = /*group_position +*/ move;
-                end = begin + duration;
-                labelsPos.push(end);
-                groups[groupID] = end;
-                //console.log("  depth = 0    ->     ", labelsPos, groups);
-
-
-
-                /*
                 if(depth === 0){
-                    // this is the first 'duration' added to this lable.
-                    begin = group_position + move;
+                    // This is the first 'duration' added to this lable.
+                    begin = move + group_position;
                     end = begin + duration;
                     labelsPos.push(end);
                     groups[groupID] = end;
-                    console.log("  depth = 0    ->     ", labelsPos, groups);
                 }
                 else{
-                    
+                    const label_position = labelsPos[labelsPos.length-1];
                     // If 'group_position' is behind 'label_position': then use 'label_position',
                     // but if 'group_position' is further ahead; then use 'group_position'.
-                    const label_position = labelsPos[labelsPos.length-1];
+                    const pos = Math.max(0.0, group_position - label_position); //<-Not accepting a number below zero.
                     // If this is not the first 'duration', negative position is not possible,
                     // because this 'duration' begins where the last one ended.
-                    const pos = Math.max(label_position, group_position);
-                    begin = Math.max(pos, pos + move);
-
+                    begin = Math.max(0.0, pos + move); //<-Not accepting a number below zero.
+                    end = begin + duration;
                     
-                    //const pos = Math.max(0.0, group_position - label_position); //<-Not accepting a number below zero.
-                    //begin = Math.max(0.0, pos + move); //<-Not accepting a number below zero.
-                    
-
-                    
-
                     labelsPos[labelsPos.length-1] += end;
-                    groups[groupID] += end;
-                    console.log("  depth > 0    ->     ", labelsPos, groups);
+                    groups[groupID] = labelsPos[labelsPos.length-1];
                 }
-                */
-                //console.log("     [begin, end] -> ", [begin, end], "\n");
                 return [begin, end];
             }
             function fillLayers(){
@@ -305,9 +284,14 @@
                     return labelsText;
                 },
                 getTexts(){
-                    return texts;
+                    return {
+                        labels: labelsText, 
+                        texts: texts, 
+                        groups: groups
+                    };
                 },
                 scaleData(scale){
+                    // This function will move the all data left or right on the x-scales.
                     for(let i = 0; i < durations[0].length ; ++i){
                         durations[0][i][0] += scale;
                         durations[0][i][1] += scale;
@@ -317,6 +301,15 @@
                     // the function will generate the data for the chart.
                     const dataSets = [];
                     for( let i = 0; i < durations.length ; ++i){
+                        // Creating colors with alpha channel:
+                        // Clone the colors array:
+                        const alphaColors = [...colors[i]];
+                        alphaColors.forEach((c, j) => {
+                            if(c.length && c.length > 0){
+                                alphaColors[j] = `${c.slice(0, -1)}, ${opacity})`;
+                            }
+                        });
+
                         dataSets.push({
                             label: "Tímaspan " + (i+1),
                             data: durations[i],
@@ -324,7 +317,7 @@
                             borderWidth: borderWidth,
                             borderRadius: borderRadius,
                             borderColor: colors[i],
-                            backgroundColor: colors[i], // <- Fix here.... opacity
+                            backgroundColor: alphaColors,
                             barPercentage: barPercentage,
                         });
                     }
@@ -345,16 +338,11 @@
         // 4. argument = Lengd tímabils.
         // 5. argument = Stutt lýsing.
         // 6. argument = Nákvæmari lýsing.
-        /*
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', 1.0, 1.5, 'Velja leið - Siemens', 'Bera saman leiðir og velja ódýrustu leiðina sem Siemens býður upp á til að fjartengjast skjámyndakerfum. Skrifa punkta.');
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', 0.0, 1.5, 'Velja leið - Siemens', 'Bera saman leiðir og velja ódýrustu leiðina sem Siemens býður upp á til að fjartengjast skjámyndakerfum. Skrifa punkta.');
         ldM.add('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0, 'Kostnaðaráætlun - Siemens', 'Útbúa einhverskonar kostnaðaráætlun byggða á Siemens.');
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', -0.5, 1.5, 'Heimildaleit - Siemens', 'Skoða heimasíðu Siemens vandlega og skrifa texta.')
-        .addLayer('na', 'rgb(4, 2, 135)', 1.0, 1.5)
-        .addLayer('na', 'rgb(4, 2, 135)', 1.0, 1.5)
-        .addLayer('na', 'rgb(200, 2, 5)', 1.0, 1.5);
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', -0.5, 1.5, 'Heimildaleit - Siemens', 'Skoða heimasíðu Siemens vandlega og skrifa texta.');
         ldM.add('skyrsla', 'rgb(153, 102, 255)', 0.0, 2.0, 'Heimildaleit - Ský og Firebase', 'Skoða og taka saman upplýsingar um skýjaþjónustur sem og Firebase.');
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', -1.0, 1.0, 'Heimildaleit - mySCADA', 'Finna upplýsingar og athuga verð fyrir sambærilega aðferð og valin var hjá Siemens. Skrifa punkta.')
-        .addLayer('na', 'rgb(200, 2, 5)', 1.0, 1.5);
+        ldM.add('skyrsla', 'rgb(153, 102, 255)', -1.0, 1.0, 'Heimildaleit - mySCADA', 'Finna upplýsingar og athuga verð fyrir sambærilega aðferð og valin var hjá Siemens. Skrifa punkta.');
         ldM.add('skyrsla', 'rgb(153, 102, 255)', 0.0, 2.0, 'Skipulag skýrslu', 'Ákveða hvaða efni á að vera til umfjöllunar í 1. inngangi, í 2. meginmál eða í 2.5 tilraunaverkefnið.');
         ldM.add('skyrsla', 'rgb(153, 102, 255)', 0.0, 4.0, 'Tilraunaverkefnið', 'Byrja á texta um tilraunaverkefnið.');
         ldM.add('skyrsla', 'rgb(153, 102, 255)', -2.0, 2.0, 'Lokaorð og samantekt', 'Skrifa lokaorð og samantekt.');
@@ -362,7 +350,7 @@
         ldM.add('skyrsla', 'rgb(153, 102, 255)', -4.0, 6.0, 'Samstilling', 'Samstilla og yfirfara allan texta sem kominn er.');
         ldM.add('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0, 'Heimildaskrá og almennur frágangur', 'Yfirfara heimildaskrá og yfirfara skýrslu í heild.');
 
-        ldM.add('verkefni', 'rgb(153, 102, 255)', -2.0, 2.0, 'Upplýsingasöfnun - Smith og Norland', 'Hafa samband við Smith og Norland sem er umboðsaðili fyrir Siemens og fá verð á iðntölvum og leyfum.');
+        ldM.add('verkefni', 'rgb(153, 102, 255)', -3.0, 2.0, 'Upplýsingasöfnun - Smith og Norland', 'Hafa samband við Smith og Norland sem er umboðsaðili fyrir Siemens og fá verð á iðntölvum og leyfum.');
         ldM.add('verkefni', 'rgb(153, 102, 255)', -1.5, 3.0, 'Upplýsingasöfnun - Siemens', 'Setja upp TIA Portal og skoða leiðir sem eru í boði.');
         ldM.add('verkefni', 'rgb(153, 102, 255)', -1.0, 1.0, 'Útvega leyfi', 'Útvega leyfi fyrir TIA sem og iðntölvu sem hentar fyrir verkefnið.');
         ldM.add('verkefni', 'rgb(153, 102, 255)', -1.5, 0.5, 'Setja upp Raspberry Pi', 'Setja upp RPi svo hægt sé að prófa ýmsar aðferðir til að tengjast iðntölvunni.');
@@ -371,73 +359,39 @@
         ldM.add('verkefni', 'rgb(153, 102, 255)', 0.0, 1.0, 'Upplýsingaöflun - Andor ehf', 'Fá verð og hugmyndir frá Andor ehf varðandi mySCADA.');
         ldM.add('verkefni', 'rgb(153, 102, 255)', -0.5, 1.0, 'Upplýsingaöflun - mySCADA', 'Skoða framboðið hjá mySCADA.');
         ldM.add('verkefni', 'rgb(153, 102, 255)', 0.25, 2.25, 'Útfæra samskiptaleið', 'Koma upp samskiptaleið á milli RPi og iðntölvunnar.');
-        */
         ldM.add('verkefni', 'rgb(153, 102, 255)', 0.5, 2.5, 'Upplýsingaöflun - HTTPS/OAuth', 'Skoða HTTPS/OAuth og finna leið til að koma upp öruggari tengingu fyrir veraldarvefinn.');
-        ldM.add('verkefni', 'rgb(153, 102, 255)', 1.0, 2.0, 'Færa samskipti yfir á vefþjónn', 'Færa samskipti af RPi og yfir á vefþjón.');
+        ldM.add('verkefni', 'rgb(153, 102, 255)', -1.0, 2.0, 'Færa samskipti yfir á vefþjónn', 'Færa samskipti af RPi og yfir á vefþjón.');
         ldM.add('verkefni', 'rgb(153, 102, 255)', -0.25, 2.0, 'Útbúa viðauka', 'Taka saman og útbúa dæmi sem fara í viðauka, t.d. LHTTP og MQTT í TIA Portal.');
 
-        ldM.add('hugtok', 'rgb(153, 102, 255)', -1.4, 0.6, `Heimildaleit og hugtök (alls ${concepts.length} atriði)`, '')
-        .addLayer('hugtok', 'rgb(1, 102, 255)', 0.2, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.2, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.2, 0.6);/*
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.6);
-*/
-        ldM.add('vorn', 'rgb(153, 102, 255)', 1.0, 10.0, 'Undirbúa vörn', '', false)
-        .addLayer('vorn', 'rgb(153, 102, 255)', 6.0+_DAY(4), 2.0);
+        ldM.add('hugtok', 'rgb(153, 102, 255)', -1.0, 0.55, `Heimildaleit og hugtök (alls ${concepts.length} atriði)`, '')
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
+        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55);
+
+        ldM.add('vorn', 'rgb(153, 102, 255)', 8.0+_DAY(2), 1.0, 'Undirbúa vörn', '', false)
+        .addLayer('vorn', 'rgb(153, 102, 255)', 7.0+_DAY(2), 2.0);
 
         //sM.ScaleData(ldM.getData());
         ldM.scaleData(sM.getScale());
-        const data = ldM.getChartData( 3.0, 8.0, 1.0, 1.0);
+        const data = ldM.getChartData( 3.0, 8.0, 1.0, 0.5);
         
-
-
-
-/*
-        
-        manager.addLabel(`Heimildaleit og hugtök (alls ${concepts.length} atriði)`);
-        manager.addDuration('A', 1.0, 13,0, 'hugtok');
-        manager.addLabel("Undirbúa vörn", false);
-        manager.addDuration('A', 9.0+_DAY(2), 10.0+_DAY(2), 'vorn');
-        manager.addDuration('B', 7.5-_DAY(2), 9.0+_DAY(2), 'vorn');
-
-
-        // -- Vinsla á texti fyrir 'Skýrslan' og 'verkefni' --
-        const labels = [];
-        toDo.forEach((text, i) => labels.push(`${text[3]} [${i+1}]`));
-
-        const durations = [];
-        const durations2 = [];
-        for(let curr = [_SW, _SW,], i = 0; i < labels.length; i++) {
-            let begin = curr[toDo[i][0]] + toDo[i][1];
-            let end = begin + toDo[i][2];
-            curr[toDo[i][0]] = end;
-            //console.log("B:", begin, " E:", end, " C:", curr[toDo[i][0]], " i: ", toDo[i][0]);
-            durations.push([begin, end]); durations2.push([0, 0]);
-        }
-
-        _COUNTER = labels.length;
-        durations.push([1, 13]); durations2.push([0, 0]);
-        labels.push(`Heimildaleit og hugtök (alls ${concepts.length} atriði) [${++_COUNTER}]`);
-        durations.push([9.0+_DAY(2), 10.0+_DAY(2)]); durations2.push([7.5-_DAY(2), 9.0+_DAY(2)]);
-        labels.push("Undirbúa vörn");
-*/
-
 
         
         let refCount = ldM.getReferenceCount(); // heimildir.
@@ -506,18 +460,18 @@
                         },
                     },
                     annotation: {
-                        annotations: {/*
-                            line0: getLine(1.0, "Gleðilegt nýtt ár 2024!", 'center', 'gray'), // 01jan/00+0
-                            line1: getLine(-2.0+_DAY(4), deadlines[0][2], 'center', 'green'), // 15des/11+4
-                            line2: getLine(4.0, deadlines[1][2], 'center', 'green'), // 22des/04+0
-                            line3: getLine(4.0+_DAY(4), deadlines[2][2], 'center', 'gray'), // 26jan/04+4
-                            line4: getLine(7.0, deadlines[3][2], 'center', 'red'), // 12feb/07+0
-                            line5: getLine(9.0, deadlines[4][2], 'center', 'red'), // 26feb/09+0
-                            line6: getLine(10.0+_DAY(2), deadlines[5][2], 'center', 'red'), // 04mar/10+2
-                            line7: getLine(17.0, deadlines[6][2], 'center', 'red'), // 22apr/17+0
-                            line8: getLine(19.0+_DAY(4), deadlines[7][2], 'center', 'red'), // 10maí/19+4
-                            line9: getLine(20.0+_DAY(2), deadlines[8][2], 'center', 'red'), // 15maí/20+2
-                        */},
+                        annotations: {
+                            line0: getLine(3.0, "Gleðilegt nýtt ár 2024!", 'center', 'gray'), // 01jan/00+0
+                            line1: getLine(0.0+_DAY(4), deadlines[0][2], 'center', 'green'), // 15des/11+4
+                            line2: getLine(6.0, deadlines[1][2], 'center', 'green'), // 22des/04+0
+                            line3: getLine(6.0+_DAY(4), deadlines[2][2], 'center', 'gray'), // 26jan/04+4
+                            line4: getLine(9.0, deadlines[3][2], 'center', 'red'), // 12feb/07+0
+                            line5: getLine(11.0, deadlines[4][2], 'center', 'red'), // 26feb/09+0
+                            line6: getLine(12.0+_DAY(2), deadlines[5][2], 'center', 'red'), // 04mar/10+2
+                            line7: getLine(19.0, deadlines[6][2], 'center', 'red'), // 22apr/17+0
+                            line8: getLine(21.0+_DAY(4), deadlines[7][2], 'center', 'red'), // 10maí/19+4
+                            line9: getLine(22.0+_DAY(2), deadlines[8][2], 'center', 'red'), // 15maí/20+2
+                        },
                     },
                 }
             }
@@ -528,6 +482,7 @@
         const linurit = new Chart(canvas, config);
         linurit.update();
 
+        
 
         // HTML:
         const nodeSkil = document.getElementById("skil");
@@ -542,17 +497,19 @@
             nodeSkil.appendChild(node);
         });
 
-        ldM.getTexts().forEach(function(text, i){
+        // Using the JS 'Destructuring assignment' syntax:
+        const {texts} = ldM.getTexts();
+        texts.forEach(function(text, i){
             if(text === null || text.legend === 0){
                 return;
             }
             const node = document.createElement('span');
-            const textnode = document.createTextNode(`[${i+1}] ${text[4]}`);
+            const textnode = document.createTextNode(text);
             node.appendChild(textnode);
-            if(text[0] === 'skyrsla'){
+            if(i < 11){ // 'skyrsla'
                 nodeSkyrsla.appendChild(node);
             }
-            else if(text[0] === 'verkefni'){
+            else if(i < 23){ // 'verkefni'
                 nodeVerkefni.appendChild(node);
             }
         });
