@@ -65,24 +65,7 @@
     </main>
 
 	<script>
-        // -- Global variables --
-        const _COLORS = {
-            red: 'rgb(255, 99, 132)',
-            orange: 'rgb(255, 159, 64)',
-            yellow: 'rgb(255, 205, 86)',
-            green: 'rgb(75, 192, 192)',
-            blue: 'rgb(54, 162, 235)',
-            purple: 'rgb(153, 102, 255)',
-            grey: 'rgb(201, 203, 207)'
-        };
-        const _SW = -2.0; // Starting week.
-        const _EW = 21.0; // Last week.
-        const _PX = 30; // Hight per row.
-        function _DAY(day){
-            return 0.14286 * day;
-        }
-
-
+        // --- Defining and implementing the 'ScalesManager' ---
         function getScalesManager(_length, _startPoint = 1.0, _resolution = 'none'){
             // Private variables:
             const scales = {
@@ -114,67 +97,24 @@
             }
             // Public interface:
             return {
+                getScale(){
+                    return -startPoint;
+                },
                 getMin(){
                     return Math.ceil(min);
                 },
                 getMax(){
                     return Math.ceil(max);
                 },
-                getScale(){
-                    return -startPoint;
-                },
                 scaleCallback(x){
                     return (ifNegativeNumbers(startPoint + x) % resolution) + zeroOrOne;
                 },
             };
         };
-        const sM = getScalesManager(23, -3, 'weeks');
 
 
 
-        // -- Texti fyrir 'hugtok' --
-        const concepts = [
-            "Skilgreining á kerfum.",
-            "Skilgreining á iðnstýringum.",
-            "Skilgreining á iðntölvum.",
-            "Skilgreining á skjámyndakerfum.",
-            "Skilgreining áGNU/Linux og RPi (Raspberry Pi) smátölvum.",
-            "Skilgreining á HTML (HyperText Markup Language).",
-            "Skilgreining á CSS (Cascading Style Sheets; oft kallað stílsnið).",
-            "Skilgreining á JS (JavaScript).",
-            "Skilgreining á vefþjóni (backend eða bakendi).",
-            "Skilgreining á AWS (Amazon Web Services) og Supabase.",
-            "Skilgreining á vefsíðu (frontend eða framendi).",
-            "Skilgreining á gagnagrunni (Database eða DB).",
-            "Skilgreining á vafra (web-browser).",
-            "Vitna í Mozilla(Firefox), Google(Chrome), Brave eða KDE(Konqueror).",
-            "Skilgreining á HTTP/HTTPS (Hypertext Transfer Protocol /Secure).",
-            "Skilgreining á IoT (The Internet of Things) og MQTT (the standard for IoT messaging).",
-            "Skilgreining á TLS (Transport Layer Security, líka kallað SSL).",
-            "Skilgreining á SVG (Scalable Vector Graphics) og tengingunni við HTML og vafra.",
-            "Skilgreining á Inkscape (vector graphics editor).",
-            "Hvernig nýtist LHTTP safn þegar sett er upp á Siemens Iðntölvu?",
-            "Skilgreining á SCADA staðlinum.",
-        ];
-
-        // -- Texti fyrir 'skil' --
-        const deadlines = [
-            // deadlines[i][0]=Tímin.
-            // deadlines[i][1]=Ónotað.
-            // deadlines[i][2]=Stutt lýsing (fer á línuna á ritinu).
-            // deadlines[i][3]=Nákvæmari lýsing.
-            [0, 0, "Umsókn um lokaverkefni",              "Fylla inn umsókn um lokaverkefni (15. desember 2023)."],
-            [0, 0, "Uppsetning skýrslu og verkáætlun",    "a) Setja upp skýrslu og ákveða kaflaskiptingu. b) Útbúa Gantt rit og skipuleggja tíma (22. janúar)."],
-            [0, 0, "IEEE heimildanotkun fyrirlestur",     "Fyrirlestur frá skólanum um IEEE heimildanotkun (26. janúar - 1 klst 12:00-13:00)."],
-            [0, 0, "Fyrri áfangaskil",                    "Vera búinn að vinna í gegnum kaflana í meginmáli (12. febrúar)."],
-            [0, 0, "Seinni áfangaskil",                   "Fræðin og undirbúningur fyrir úrvinnslu á mælingum og/eða gögnum á að liggja að mestu fyrir í skýrslunni (26. febrúar)."],
-            [0, 0, "Miðannarvörn á seinni skilum",        "Kynning + powerpoint og spurningar frá kennara (4. mars - 8. mars )."],
-            [0, 0, "Lokaskil",                            "Lokaskil, hér á skýslan að vera full búin (22. apríl)."],
-            [0, 0, "Varnir á lokaverkefni",               "Varnir á lokaverkefni, upplýsingar koma seinna (miðjan maí)."],
-            [0, 0, "Skil á skýrslu inn á skemma.is",      "Skil á skýrslu inn á skemma.is eftir vörn, áfanga lokið!"],
-    ];
-
-
+        // --- Defining and implementing the 'LabelsAndDataManager' ---
         function getLabelsAndDataManager(){
             // Private variables:
             let countReferences = 0;
@@ -197,7 +137,6 @@
             function calcBeginAndEnd(groupID, move, duration, depth = 0){
                 // If the groupID is undefined, use zero and a new group is declared.
                 const group_position = groupID in groups ? groups[groupID] : 0.0;
-
                 let begin, end;
                 if(depth === 0){
                     // This is the first 'duration' added to this lable.
@@ -207,6 +146,7 @@
                     groups[groupID] = end;
                 }
                 else{
+                    // Other added 'durations' to this lable take reference from the first 'duration'.
                     const label_position = labelsPos[labelsPos.length-1];
                     // If 'group_position' is behind 'label_position': then use 'label_position',
                     // but if 'group_position' is further ahead; then use 'group_position'.
@@ -233,7 +173,6 @@
                     }
                 });
             }
-
             // Public interface:
             return {
                 add(groupID, color, move, duration, label, text, withReference = true){
@@ -309,7 +248,6 @@
                                 alphaColors[j] = `${c.slice(0, -1)}, ${opacity})`;
                             }
                         });
-
                         dataSets.push({
                             label: "Tímaspan " + (i+1),
                             data: durations[i],
@@ -325,13 +263,128 @@
                         // Chart-JS will use this object.
                         labels: labelsText,
                         datasets: dataSets,
-                    }
+                    };
                 },
             };
         };
-        const ldM = getLabelsAndDataManager();
         
-        // -- Texti fyrir 'Skýrslan' og 'verkefni' --
+
+
+        // --- Defining and implementing the 'EventsManager' ---
+        function getEventsManager(){
+            // Private variables:
+            const events = [];
+            const texts = [];
+            let refCount = 0;
+            // Constructor:
+            (() => {
+                // ...
+            })(); 
+            // Private methods:
+            // Public interface:
+            return {
+                add(pos, color, name, text, withReference = true){
+                    events.push({
+                        pos: pos,
+                        color: color,
+                        name: name,
+                        ref: withReference,
+                    });
+                    texts.push(text);
+                },
+                setReferencesNumber(referencesNum){
+                    events.forEach((event, i) => {
+                        if(event.ref){
+                            event.name += ` [${referencesNum}]`;
+                            texts[i] = `[${referencesNum}] ${texts[i]}`;
+                            ++referencesNum;
+                        }
+                    });
+                    refCount = referencesNum;
+                },
+                getReferencesNumber(){
+                    return refCount;
+                },
+                getTexts(){
+                    return texts;
+                },
+                getChartAnnotations(){
+                    const annotations = {};
+                    events.forEach((event, i) => {
+                        annotations['line-'+i] = {
+                            type: 'line',
+                            xMin: event.pos,
+                            xMax: event.pos,
+                            borderColor: event.color,
+                            borderWidth: 3,
+                            label: {
+                                backgroundColor: event.color,
+                                content: event.name,
+                                display: true,
+                                position: 'center', // start | center | end
+                                rotation: 90,
+                            },
+                        };
+                    });
+                    return annotations;
+                },
+            };
+        };
+
+
+
+        // --- Global variables ---
+        const _COLORS = {
+            red: 'rgb(255, 99, 132)',
+            orange: 'rgb(255, 159, 64)',
+            yellow: 'rgb(255, 205, 86)',
+            green: 'rgb(75, 192, 192)',
+            blue: 'rgb(54, 162, 235)',
+            purple: 'rgb(153, 102, 255)',
+            grey: 'rgb(201, 203, 207)'
+        };
+        const _PX = 35; // Hight per row.
+        function _DAY(day){
+            return 0.14286 * day;
+        }
+
+        // --- Create instances of the 'ScalesManager' ---
+        const sM = getScalesManager(23, -3, 'weeks');
+        // --- Create instances of the 'LabelsAndDataManager' ---
+        const ldM = getLabelsAndDataManager();
+        // --- Create instances of the 'EventsManager' ---
+        const eM = getEventsManager();
+
+
+
+        // --- Text for 'hugtök' ---
+        const concepts = [
+            "Skilgreining á kerfum.",
+            "Skilgreining á iðnstýringum.",
+            "Skilgreining á iðntölvum.",
+            "Skilgreining á skjámyndakerfum.",
+            "Skilgreining áGNU/Linux og RPi (Raspberry Pi) smátölvum.",
+            "Skilgreining á HTML (HyperText Markup Language).",
+            "Skilgreining á CSS (Cascading Style Sheets; oft kallað stílsnið).",
+            "Skilgreining á JS (JavaScript).",
+            "Skilgreining á vefþjóni (backend eða bakendi).",
+            "Skilgreining á AWS (Amazon Web Services) og Supabase.",
+            "Skilgreining á vefsíðu (frontend eða framendi).",
+            "Skilgreining á gagnagrunni (Database eða DB).",
+            "Skilgreining á vafra (web-browser).",
+            "Vitna í Mozilla(Firefox), Google(Chrome), Brave eða KDE(Konqueror).",
+            "Skilgreining á HTTP/HTTPS (Hypertext Transfer Protocol /Secure).",
+            "Skilgreining á IoT (The Internet of Things) og MQTT (the standard for IoT messaging).",
+            "Skilgreining á TLS (Transport Layer Security, líka kallað SSL).",
+            "Skilgreining á SVG (Scalable Vector Graphics) og tengingunni við HTML og vafra.",
+            "Skilgreining á Inkscape (vector graphics editor).",
+            "Hvernig nýtist LHTTP safn þegar sett er upp á Siemens Iðntölvu?",
+            "Skilgreining á SCADA staðlinum.",
+        ];
+
+
+
+        // --- Text for 'skýrsla' and 'verkefni' ---
         // 1. argument = Framhal af tímanum fyrir ofan.        
         // 2. argument = Litur timabilsins á línuritinu.
         // 3. argument = Byrjun tímabils(0 er endir timabilsins á undan).
@@ -388,36 +441,27 @@
         ldM.add('vorn', 'rgb(153, 102, 255)', 8.0+_DAY(2), 1.0, 'Undirbúa vörn', '', false)
         .addLayer('vorn', 'rgb(153, 102, 255)', 7.0+_DAY(2), 2.0);
 
-        //sM.ScaleData(ldM.getData());
         ldM.scaleData(sM.getScale());
         const data = ldM.getChartData( 3.0, 8.0, 1.0, 0.5);
         
 
-        
-        let refCount = ldM.getReferenceCount(); // heimildir.
-        deadlines.forEach(function(item){
-            item[2] = `${item[2]} [${++refCount}]`;
-            item[3] = `[${refCount}] ${item[3]}`; 
-        });
-        function getLine(at, text, pos, color){
-            return {
-                type: 'line',
-                xMin: at,
-                xMax: at,
-                borderColor: color,
-                borderWidth: 3,
-                label: {
-                    backgroundColor: color,
-                    content: text,
-                    display: true,
-                    position: pos, // start | center | end
-                    rotation: 90,
-                },
-            };
-        }
+
+        // --- Text for 'skil' ---
+        eM.add(3.0,         'gray', "Gleðilegt nýtt ár 2024!", null, false); // 01jan/00+0
+        eM.add(0.0+_DAY(4),'green', "Umsókn um lokaverkefni", "Fylla inn umsókn um lokaverkefni (15. desember 2023)."); // 15des/11+4
+        eM.add(6.0,        'green', "Uppsetning skýrslu og verkáætlun", "a) Setja upp skýrslu og ákveða kaflaskiptingu. b) Útbúa Gantt rit og skipuleggja tíma (22. janúar)."); // 22des/04+0
+        eM.add(6.0+_DAY(4), 'gray', "IEEE heimildanotkun fyrirlestur", "Fyrirlestur frá skólanum um IEEE heimildanotkun (26. janúar - 1 klst 12:00-13:00)."); // 26jan/04+4
+        eM.add(9.0,          'red', "Fyrri áfangaskil", "Vera búinn að vinna í gegnum kaflana í meginmáli (12. febrúar)."); // 12feb/07+0
+        eM.add(11.0,         'red', "Seinni áfangaskil", "Fræðin og undirbúningur fyrir úrvinnslu á mælingum og/eða gögnum á að liggja að mestu fyrir í skýrslunni (26. febrúar)."); // 26feb/09+0
+        eM.add(12.0+_DAY(2), 'red', "Miðannarvörn á seinni skilum", "Kynning + powerpoint og spurningar frá kennara (4. mars - 8. mars )."); // 04mar/10+2
+        eM.add(19.0,         'red', "Lokaskil", "Lokaskil, hér á skýslan að vera full búin (22. apríl)."); // 22apr/17+0
+        eM.add(21.0+_DAY(4), 'red', "Varnir á lokaverkefni", "Varnir á lokaverkefni, upplýsingar koma seinna (miðjan maí)."); // 10maí/19+4
+        eM.add(22.0+_DAY(2), 'red', "Skil á skýrslu inn á skemma.is", "Skil á skýrslu inn á skemma.is eftir vörn, áfanga lokið!"); // 15maí/20+2
+        eM.setReferencesNumber(ldM.getReferenceCount());
 
 
 
+        // Configuration for the ChartJS:
         const config = {
             type: 'bar',
             data: data,
@@ -460,23 +504,12 @@
                         },
                     },
                     annotation: {
-                        annotations: {
-                            line0: getLine(3.0, "Gleðilegt nýtt ár 2024!", 'center', 'gray'), // 01jan/00+0
-                            line1: getLine(0.0+_DAY(4), deadlines[0][2], 'center', 'green'), // 15des/11+4
-                            line2: getLine(6.0, deadlines[1][2], 'center', 'green'), // 22des/04+0
-                            line3: getLine(6.0+_DAY(4), deadlines[2][2], 'center', 'gray'), // 26jan/04+4
-                            line4: getLine(9.0, deadlines[3][2], 'center', 'red'), // 12feb/07+0
-                            line5: getLine(11.0, deadlines[4][2], 'center', 'red'), // 26feb/09+0
-                            line6: getLine(12.0+_DAY(2), deadlines[5][2], 'center', 'red'), // 04mar/10+2
-                            line7: getLine(19.0, deadlines[6][2], 'center', 'red'), // 22apr/17+0
-                            line8: getLine(21.0+_DAY(4), deadlines[7][2], 'center', 'red'), // 10maí/19+4
-                            line9: getLine(22.0+_DAY(2), deadlines[8][2], 'center', 'red'), // 15maí/20+2
-                        },
+                        annotations: eM.getChartAnnotations(),
                     },
                 }
             }
         };
-        // Setja upp línuritið:
+        // Setting up and rendering the ChartJS:
         const canvas = document.getElementById('linurit');
         canvas.style.maxHeight = `${ldM.getLabels().length * _PX}px`;
         const linurit = new Chart(canvas, config);
@@ -484,17 +517,19 @@
 
         
 
-        // HTML:
+        // HTML - Creating lists:
         const nodeSkil = document.getElementById("skil");
         const nodeSkyrsla = document.getElementById("skyrsla");
         const nodeVerkefni = document.getElementById("verkefni");
         const nodeHugtok = document.getElementById("hugtok");
-
-        deadlines.forEach(function(item, i){
-            const node = document.createElement('span');
-            const textnode = document.createTextNode(item[3]);
-            node.appendChild(textnode);
-            nodeSkil.appendChild(node);
+        
+        eM.getTexts().forEach(function(text, i){
+            if(text){
+                const node = document.createElement('span');
+                const textnode = document.createTextNode(text);
+                node.appendChild(textnode);
+                nodeSkil.appendChild(node);
+            }
         });
 
         // Using the JS 'Destructuring assignment' syntax:
