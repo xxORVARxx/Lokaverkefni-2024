@@ -9,7 +9,11 @@
     <!--link rel="icon" href="./favicon.ico" type="image/x-icon"-->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <!-- CSS code below -->
     <style>
+        body {
+            visibility: hidden;
+        }
         h1 {
             padding: 50px 100px;
         }
@@ -39,7 +43,25 @@
             margin-bottom: 300px;
         }
     </style>
+
+    <!-- JavaScript code below -->
+    <script type="text/javascript">
+        // Declaring a function:
+        function domReady(callback) {
+            document.readyState === 'interactive' || document.readyState === 'complete'
+                ? callback()
+                : document.addEventListener('DOMContentLoaded', callback);
+        }
+
+        // Calling the function and passing in a callback-function as a parameter:
+        domReady(() => {
+            // Display body when DOM is loaded:
+            document.body.style.visibility = 'visible';
+        });
+    </script>
   </head>
+
+  <!-- HTML code below -->
   <body>
     <main>
         <h1>Örvar Sigþórsson - Diplóma í rafiðnfræði - Lokaverkefni 2024</h1>
@@ -64,7 +86,8 @@
         <canvas id="linurit",  style="width:100%; max-height: 30px;"></canvas>
     </main>
 
-	<script>
+    <!-- JavaScript code below -->
+	<script type="text/javascript">
         // --- Defining and implementing the 'ScalesManager' ---
         function getScalesManager(_length, _startPoint = 1.0, _resolution = 'none'){
             // Private variables:
@@ -308,16 +331,42 @@
 
 
         // --- Defining and implementing the 'EventsManager' ---
-        function getEventsManager(){
+        function getEventsManager(showCurrentWeek = null){
+            // 'showCurrentWeek' has to implement the following interface:
+            //  {
+            //    scale: number,  // Get it from the 'ScalesManager'.
+            //    yearStartDay: number,  // Between 0 and 6.
+            //    color: string,  // E.g: 'rgb(255, 99, 132)' and 'rgb(255, 99, 132, 0.5)'.
+            //  }
+
             // Private variables:
             const events = [];
             const texts = [];
             let refCount = 0;
             // Constructor:
             (() => {
-                // ...
+                if(showCurrentWeek instanceof Object){
+                    events.push({
+                        pos: getCurrentWeek(showCurrentWeek.scale, showCurrentWeek.yearStartDay),
+                        color: showCurrentWeek.color,
+                        name: "Í dag",
+                        ref: false,
+                    });
+                    texts.push("");
+                }
             })(); 
             // Private methods:
+            function getCurrentWeek(scale = 0, yearStartDay = 0){
+                const currentDate = new Date();
+                // Set the target date to the first day of the year:
+                const targetDate = new Date(currentDate.getFullYear(), 0, 1);
+                // Calculate the difference in milliseconds between the current date and the target date:
+                const timeDifference = currentDate - targetDate;
+                // Calculate the number of days passed:
+                const daysPassed = Math.floor(timeDifference / (24 * 60 * 60 * 1000));
+                // Calculate the current week number:
+                return scale + ((daysPassed + yearStartDay) / 7);
+            };
             // Public interface:
             return {
                 add(pos, color, name, text, withReference = true){
@@ -390,7 +439,7 @@
         // --- Create instances of the 'LabelsAndDataManager' ---
         const ldM = getLabelsAndDataManager();
         // --- Create instances of the 'EventsManager' ---
-        const eM = getEventsManager();
+        const eM = getEventsManager({scale: sM.getScale(), yearStartDay: 0, color: 'gray'});
 
 
 
@@ -598,7 +647,6 @@
             node.appendChild(textnode);
             nodeHugtok.appendChild(node);
         });
-
     </script>
   </body>
 </html>
