@@ -11,36 +11,55 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <!-- CSS code below -->
     <style>
+        :root{
+            /* root variables are available in the whole document.*/
+            /* In this document the 'root' tag is the '<html>' tag.*/
+
+            /* Set the font-size to 62.5% to makes it easier to working with 'rem'.*/
+            /* 62.5% font-size is equal to 10px and 1rem in most browsers*/
+            font-size: 62.5%; /* 62.5% == 10px == 1rem */
+        }
         body {
             visibility: hidden;
         }
         h1 {
-            padding: 50px 100px;
+            font-size: 2.5vw;
+            padding: 4rem 10vw
         }
         .grid-container {
             display: grid;
             grid-template-columns: 0.7fr 1fr 1fr 1.3fr;
-            gap: 5px 50px;
-            /*background-color: #2196F3;*/
-            padding: 50px 100px;
+            gap: 0.5rem 5rem;
+            padding: 0rem 10vw
+        }
+        @media only screen and (max-width: 768px) {
+            /* For mobile phones, if the browser window is 768px or smaller. */
+            h1 {
+                font-size: 6vw;
+            }
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
         }
         .grid-container > div {
             display: flex; /* or inline-flex */
             flex-direction: column; /* row | row-reverse | column | column-reverse */
-            gap: 10px;
-            /*background-color: rgba(255, 255, 255, 0.8);*/
-            text-align: center;
-            font-size: 18px;
+            gap: 1rem;
+            font-size: 1.8rem;
+            padding: 4rem 0rem
         }
         .grid-container > div > span {
             text-align: left;
-            font-size: 12px;
+            font-size: 1.2rem;
         }
         #bil {
-            height: 30px;
+            height: 3rem;
         }
-        canvas {
-            margin-bottom: 300px;
+        #chart-container{
+            position: relative;
+            height: 80vh;
+            width: max(97vw, 120rem);
+            padding: 0rem 1vw;
         }
     </style>
 
@@ -83,7 +102,9 @@
 	<div id="bil"></div>
 
         <h1>Verkáætlun fyrir lokaverkefni</h1>
-        <canvas id="linurit",  style="width:100%; max-height: 30px;"></canvas>
+        <div id="chart-container">
+            <canvas id="chart"></canvas>
+        </div>
     </main>
 
     <!-- JavaScript code below -->
@@ -429,7 +450,6 @@
             purple: 'rgb(153, 102, 255)',
             grey: 'rgb(201, 203, 207)'
         };
-        const _PX = 35; // Hight per row.
         function _DAY(day){
             return 0.14286 * day;
         }
@@ -602,10 +622,9 @@
             },
         };
         // Setting up and rendering the ChartJS:
-        const canvas = document.getElementById('linurit');
-        canvas.style.maxHeight = `${ldM.getLabels().length * _PX}px`;
-        const linurit = new Chart(canvas, config);
-        linurit.update();
+        const canvas = document.getElementById('chart');
+        const chart = new Chart(canvas, config);
+        chart.update();
 
         
 
