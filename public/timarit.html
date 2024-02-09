@@ -32,19 +32,10 @@
             gap: 0.5rem 5rem;
             padding: 0rem 10vw
         }
-        @media only screen and (max-width: 768px) {
-            /* For mobile phones, if the browser window is 768px or smaller. */
-            h1 {
-                font-size: 6vw;
-            }
-            .grid-container {
-                grid-template-columns: 1fr;
-            }
-        }
         .grid-container > div {
             display: flex; /* or inline-flex */
             flex-direction: column; /* row | row-reverse | column | column-reverse */
-            gap: 1rem;
+            gap: 1.5rem;
             font-size: 1.8rem;
             padding: 4rem 0rem
         }
@@ -60,6 +51,15 @@
             height: 80vh;
             width: max(97vw, 120rem);
             padding: 0rem 1vw;
+        }
+        @media only screen and (max-width: 768px) {
+            /* For mobile phones, if the browser window is 768px or smaller. */
+            h1 {
+                font-size: 6vw;
+            }
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 
@@ -198,117 +198,129 @@
         // --- Defining and implementing the 'LabelsAndDataManager' ---
         function getLabelsAndDataManager(){
             // Private variables:
-            let countReferences = 0;
-            let layerDepth = 0;
-            const labelsText = [];
-            const labelsPos = [];
-            const texts = [];
-            const groups = {};
-            const colors = [
-                [],
-            ];
             const durations = [
                 [],
             ];
+            const durationsData = [
+                [
+                // 'durationsData' implement the following interface:
+                //  {
+                //    begin: float,  // Same as 'durations[0]'.
+                //    end: float,  // Same as 'durations[1]'.
+                //    groupID: string,  //  
+                //    groupPos: float,  //
+                //    color: string,  // E.g: 'rgb(255, 99, 132)' and 'rgb(255, 99, 132, 0.5)'.
+                //    obj: object,  // some other user defined properties.
+                // }
+                ],
+            ];
+            const labels = [];
+            const labelsData = [
+                // 'labelsData' implement the following interface:
+                //  {
+                //    pos: float,  //
+                //    text: string,  //
+                //    hasRef: bool,  //
+                // }
+            ];
+            const groups = {};
+            let refCount = 0;
             // Constructor:
             (() => {
                 // ...
             })(); 
             // Private methods:
-            function calcBeginAndEnd(groupID, move, duration, depth = 0){
-                // If the groupID is undefined, use zero and a new group is declared.
-                const group_position = groupID in groups ? groups[groupID] : 0.0;
-                let begin, end;
-                if(depth === 0){
-                    // This is the first 'duration' added to this lable.
-                    begin = move + group_position;
-                    end = begin + duration;
-                    labelsPos.push(end);
-                    groups[groupID] = end;
+            function LabelData(pos, text, hasRef){
+                this.pos = pos;
+                this.text = text;
+                this.hasRef = hasRef;
+            }
+            function DurationData(begin, end, groupID, groupPos, color, obj){
+                this.begin = begin;
+                this.end = end;
+                this.groupID = groupID;
+                this.groupPos = groupPos;
+                this.color = color;
+                this.obj = obj;
+            }
+            function fillLayers(depth){
+                if(durations[depth]) {
+                    console.log("Depth already exists.");
                 }
                 else{
-                    // Other added 'durations' to this lable take reference from the first 'duration'.
-                    const label_position = labelsPos[labelsPos.length-1];
-                    // If 'group_position' is behind 'label_position': then use 'label_position',
-                    // but if 'group_position' is further ahead; then use 'group_position'.
-                    const pos = Math.max(0.0, group_position - label_position); //<-Not accepting a number below zero.
-                    // If this is not the first 'duration', negative position is not possible,
-                    // because this 'duration' begins where the last one ended.
-                    begin = Math.max(0.0, pos + move); //<-Not accepting a number below zero.
-                    end = begin + duration;
-                    
-                    labelsPos[labelsPos.length-1] += end;
-                    groups[groupID] = labelsPos[labelsPos.length-1];
+                    console.log("Make new depth.");
+                    durations.push([]);
+                    durationsData.push([]);
+                    // Fill the column with zero-duration, until it's at the current label.
+                    durations.forEach( layer => {
+                        while(durations[0].length > layer.length + 1){
+                            layer.push([0.0, 0.0]);
+                        }
+                    });
+                    durationsData.forEach( layer => {
+                        while(durationsData[0].length > layer.length + 1){
+                            layer.push(undefined);
+                        }
+                    });
                 }
-                return [begin, end];
-            }
-            function fillLayers(){
-                durations.forEach( layer => {
-                    while(durations[0].length > layer.length + 1){
-                        layer.push([0.0, 0.0]);
-                    }
-                });
-                colors.forEach( layer => {
-                    while(colors[0].length > layer.length + 1){
-                        layer.push("");
-                    }
-                });
             }
             // Public interface:
             return {
-                add(groupID, color, move, duration, label, text, withReference = true){
-                    // Using the JS 'Destructuring assignment' syntax:
-                    //const [begin, end] = calcBeginAndEnd(groupID, move, duration);
+                // MOTE:
+                // The 'addLabel' function returns another function named 'setDuration' and 
+                // 'setDuration' again returns another function named 'addLayer' and 
+                // 'addLayer' always returns itself.
+                // With this settup thes functions can be called in chained:
+                // .addLabel(s,s,/b).setDuratio(s,s,f,f,/o).addLayer(s,s,f,f,/o).addLayer(s,s,f,f,/o).addLayer(s,s,f,f,/o);
+                addLabel: (label, text, withReference = true) => {
+                    labels.push(label);
+                    labelsData.push(new LabelData(0.0, text, withReference));
 
-                    durations[0].push( calcBeginAndEnd(groupID, move, duration) );
-                    colors[0].push(color);
-
-                    ++countReferences;
-                    labelsText.push(withReference ? `${label} [${countReferences}]` : label);
-                    texts.push(withReference ? `[${countReferences}] ${text}` : text);
-
-                    fillLayers();
-                    let depth = 1;
                     return {
-                        // The 'add' function returns another function named 'addLayer',
-                        // 'addLayer' will add another 'duration' to the same label.
-                        // NOTE: This tow functions can be chained:  .add(s,s,f,f,s,s,/b).addLayer(s,s,f,f);
-                        addLayer(groupID, color, move, duration){
-                            if(durations[depth]) {
-                                console.log("Depth already exists.");
-                            }
-                            else{
-                                console.log("Make new depth.");
-                                durations.push([]);
-                                colors.push([]);
-                                fillLayers(); // Fill the column with zero-duration, until it's at the current label.
-                            }
-                            durations[depth].push( calcBeginAndEnd(groupID, move, duration, depth) );
-                            colors[depth].push(color);
+                        setDuration: (groupID, color, move, duration, obj = undefined) => {
+                            // If the groupID is undefined, use zero and a new group is declared.
+                            const groupPos = groupID in groups ? groups[groupID] : 0.0;
+                            // This is the first 'duration' added to this lable.
+                            const begin = move + groupPos;
+                            const end = begin + duration;
 
-                            ++depth;
-                            return this;
-                            // The 'addLayer' function returns itself, so it can be chained,
-                            // like so:  .add(s,s,f,f,s,s,/b).addLayer(s,s,f,f).addLayer(s,s,f,f).addLayer(s,s,f,f);
+                            labelsData[labelsData.length-1].pos = end;
+                            groups[groupID] = end;
+                            durations[0].push([begin, end]);
+                            durationsData[0].push(new DurationData(begin, end, groupID, groups[groupID], color, obj));
+
+                            let depth = 0;
+                            return {
+                                addLayer(groupID, color, move, duration, obj = undefined) {
+                                    // Not a 'arrow-function' so the 'this'-keyword means this exact object
+                                    // and not any parent objects.
+                                    fillLayers(++depth);
+
+                                    // If the groupID is undefined, use zero and a new group is declared.
+                                    const groupPos = groupID in groups ? groups[groupID] : 0.0;
+                                    const labelPos = labelsData[labelsData.length-1].pos;
+                                    // If 'groupPos' is behind 'labelPos': then use 'labelPos',
+                                    // but if 'groupPos' is further ahead; then use 'groupPos'.
+                                    const pos = Math.max(0.0, groupPos - labelPos); //<-Not accepting a number below zero.
+                                    // If this is not the first 'duration', negative position is not possible,
+                                    // because this 'duration' begins where the last one ended.
+                                    const begin = Math.max(0.0, pos + move); //<-Not accepting a number below zero.
+                                    const end = begin + duration;
+
+                                    labelsData[labelsData.length-1].pos += end;
+                                    groups[groupID] = labelsData[labelsData.length-1].pos;
+                                    durations[depth].push([begin, end]);
+                                    durationsData[depth].push(new DurationData(begin, end, groupID, groups[groupID], color, obj));
+
+                                    return this;
+                                },
+                            };
                         },
                     };
                     // Now to explain these two functions, 'add' and 'addLayer': (they both add a 'duration' to the chart)
                     // 'add' is used to add a row to the to the first column, each row has a corresponding label.
                     // 'addLayer' will add a column and place the 'duration' at the current row.
                     // 'depth' is the number of columns the chart has.
-                },
-                getReferenceCount(){
-                    return countReferences;
-                },
-                getLabels(){
-                    return labelsText;
-                },
-                getTexts(){
-                    return {
-                        labels: labelsText, 
-                        texts: texts, 
-                        groups: groups
-                    };
                 },
                 scaleData(scale){
                     // This function will move the all data left or right on the x-scales.
@@ -317,38 +329,57 @@
                         durations[0][i][1] += scale;
                     }
                 },
+                setReferencesNumber(referencesNum){
+                    labelsData.forEach((data, i) => {
+                        if(data.hasRef){
+                            labels[i] += ` [${referencesNum}]`;
+                            data.text = data.text.length === 0 ? "" : `[${referencesNum}] ${data.text}`;
+                            ++referencesNum;
+                        }
+                    });
+                    refCount = referencesNum;
+                },
+                getReferenceCount(){
+                    return refCount;
+                },
+                getLabels(){
+                    return labels;
+                },
+                getLabelsData(){
+                    return labelsData;
+                },
+                getDurationsData(){
+                    return durationsData;
+                },
                 getChartData(borderWidth, borderRadius, barPercentage, opacity){
                     // the function will generate the data for the chart.
                     const dataSets = [];
                     for( let i = 0; i < durations.length ; ++i){
-                        // Creating colors with alpha channel:
-                        // Clone the colors array:
-                        const alphaColors = [...colors[i]];
-                        alphaColors.forEach((c, j) => {
-                            if(c.length && c.length > 0){
-                                alphaColors[j] = `${c.slice(0, -1)}, ${opacity})`;
-                            }
-                        });
+                        const colors = [];
+                        durationsData[i].forEach((data) => { data ? colors.push(data.color) : colors.push(""); });
+                        const alphaColors = [...colors];
+                        alphaColors.forEach((color, j) => { alphaColors[j] = color.length ? `${alphaColors[j].slice(0, -1)}, ${opacity})`: ""; });
+                     
                         dataSets.push({
                             label: "Tímaspan " + (i+1),
                             data: durations[i],
                             borderSkipped: false,
                             borderWidth: borderWidth,
                             borderRadius: borderRadius,
-                            borderColor: colors[i],
-                            backgroundColor: alphaColors,
+                            borderColor: colors,
+                            backgroundColor: alphaColors, //alphaColors,
                             barPercentage: barPercentage,
                         });
                     }
                     return {
                         // Chart-JS will use this object.
-                        labels: labelsText,
+                        labels: labels,
                         datasets: dataSets,
                     };
                 },
             };
         };
-        
+
 
 
         // --- Defining and implementing the 'EventsManager' ---
@@ -491,62 +522,88 @@
 
 
         // --- Text for 'skýrsla' and 'verkefni' ---
-        // 1. argument = Framhal af tímanum fyrir ofan.        
-        // 2. argument = Litur timabilsins á línuritinu.
-        // 3. argument = Byrjun tímabils(0 er endir timabilsins á undan).
-        // 4. argument = Lengd tímabils.
-        // 5. argument = Stutt lýsing.
-        // 6. argument = Nákvæmari lýsing.
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', 0.0, 1.5, 'Velja leið - Siemens', 'Bera saman leiðir og velja ódýrustu leiðina sem Siemens býður upp á til að fjartengjast skjámyndakerfum. Skrifa punkta.');
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0, 'Kostnaðaráætlun - Siemens', 'Útbúa einhverskonar kostnaðaráætlun byggða á Siemens.');
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', -0.5, 1.5, 'Heimildaleit - Siemens', 'Skoða heimasíðu Siemens vandlega og skrifa texta.');
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', 0.0, 2.0, 'Heimildaleit - Ský og Firebase', 'Skoða og taka saman upplýsingar um skýjaþjónustur sem og Firebase.');
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', -1.0, 1.0, 'Heimildaleit - mySCADA', 'Finna upplýsingar og athuga verð fyrir sambærilega aðferð og valin var hjá Siemens. Skrifa punkta.');
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', 0.0, 2.0, 'Skipulag skýrslu', 'Ákveða hvaða efni á að vera til umfjöllunar í 1. inngangi, í 2. meginmál eða í 2.5 tilraunaverkefnið.');
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', 0.0, 4.0, 'Tilraunaverkefnið', 'Byrja á texta um tilraunaverkefnið.');
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', -2.0, 2.0, 'Lokaorð og samantekt', 'Skrifa lokaorð og samantekt.');
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0, 'Formáli og inngangur', 'Skrifa formála og inngang.');
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', -4.0, 6.0, 'Samstilling', 'Samstilla og yfirfara allan texta sem kominn er.');
-        ldM.add('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0, 'Heimildaskrá og almennur frágangur', 'Yfirfara heimildaskrá og yfirfara skýrslu í heild.');
+        // 1.1. argument = Stutt lýsing.
+        // 1.2. argument = Nákvæmari lýsing.
+        // 2.1. argument = Framhal af tímanum fyrir ofan.        
+        // 2.2. argument = Litur timabilsins á línuritinu.
+        // 2.3. argument = Byrjun tímabils(0 er endir timabilsins á undan).
+        // 2.4. argument = Lengd tímabils.
+        ldM.addLabel('Velja leið - Siemens', 'Bera saman leiðir og velja ódýrustu leiðina sem Siemens býður upp á til að fjartengjast skjámyndakerfum. Skrifa punkta.')
+            .setDuration('skyrsla', 'rgb(153, 102, 255)', 0.0, 1.5);
+        ldM.addLabel('Kostnaðaráætlun - Siemens', 'Útbúa einhverskonar kostnaðaráætlun byggða á Siemens.')
+            .setDuration('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0);
+        ldM.addLabel('Heimildaleit - Siemens', 'Skoða heimasíðu Siemens vandlega og skrifa texta.')
+            .setDuration('skyrsla', 'rgb(153, 102, 255)', -0.5, 1.5);
+        ldM.addLabel('Heimildaleit - Ský og Firebase', 'Skoða og taka saman upplýsingar um skýjaþjónustur sem og Firebase.')
+            .setDuration('skyrsla', 'rgb(153, 102, 255)', 0.0, 2.0);
+        ldM.addLabel('Heimildaleit - mySCADA', 'Finna upplýsingar og athuga verð fyrir sambærilega aðferð og valin var hjá Siemens. Skrifa punkta.')
+            .setDuration('skyrsla', 'rgb(153, 102, 255)', -1.0, 1.0);
+        ldM.addLabel('Skipulag skýrslu', 'Ákveða hvaða efni á að vera til umfjöllunar í 1. inngangi, í 2. meginmál eða í 2.5 tilraunaverkefnið.')
+            .setDuration('skyrsla', 'rgb(153, 102, 255)', 0.0, 2.0);
+        ldM.addLabel('Tilraunaverkefnið', 'Byrja á texta um tilraunaverkefnið.')
+            .setDuration('skyrsla', 'rgb(153, 102, 255)', 0.0, 4.0);
+        ldM.addLabel('Lokaorð og samantekt', 'Skrifa lokaorð og samantekt.')
+            .setDuration('skyrsla', 'rgb(153, 102, 255)', -2.0, 2.0);
+        ldM.addLabel('Formáli og inngangur', 'Skrifa formála og inngang.')
+            .setDuration('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0);
+        ldM.addLabel('Samstilling', 'Samstilla og yfirfara allan texta sem kominn er.')
+            .setDuration('skyrsla', 'rgb(153, 102, 255)', -4.0, 6.0);
+        ldM.addLabel('Heimildaskrá og almennur frágangur', 'Yfirfara heimildaskrá og yfirfara skýrslu í heild.')
+            .setDuration('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0);
+        
+        ldM.addLabel('Upplýsingasöfnun - Smith og Norland', 'Hafa samband við Smith og Norland sem er umboðsaðili fyrir Siemens og fá verð á iðntölvum og leyfum.')
+            .setDuration('verkefni', 'rgb(153, 102, 255)', -3.0, 2.0);
+        ldM.addLabel('Upplýsingasöfnun - Siemens', 'Setja upp TIA Portal og skoða leiðir sem eru í boði.')
+            .setDuration('verkefni', 'rgb(153, 102, 255)', -1.5, 3.0);
+        ldM.addLabel('Útvega leyfi', 'Útvega leyfi fyrir TIA sem og iðntölvu sem hentar fyrir verkefnið.')
+            .setDuration('verkefni', 'rgb(153, 102, 255)', -1.0, 1.0);
+        ldM.addLabel('Setja upp Raspberry Pi', 'Setja upp RPi svo hægt sé að prófa ýmsar aðferðir til að tengjast iðntölvunni.')
+            .setDuration('verkefni', 'rgb(153, 102, 255)', -1.5, 0.5);
+        ldM.addLabel('Upplýsingaöflun - Vefþjón', 'Skoða hvaða þjónustur bjóða upp á vefþjón á skýi.')
+            .setDuration('verkefni', 'rgb(153, 102, 255)', 4.0, 2.5);
+        ldM.addLabel('Upplýsingaöflun - HTTPS samskipti', 'Skoða HTTP samskipti sem og aðrar samskiptaaðferðir til samanburðar (IoT/MQTT).')
+            .setDuration('verkefni', 'rgb(153, 102, 255)', -1.5, 1.5);
+        ldM.addLabel('Upplýsingaöflun - Andor ehf', 'Fá verð og hugmyndir frá Andor ehf varðandi mySCADA.')
+            .setDuration('verkefni', 'rgb(153, 102, 255)', 0.0, 1.0);
+        ldM.addLabel('Upplýsingaöflun - mySCADA', 'Skoða framboðið hjá mySCADA.')
+            .setDuration('verkefni', 'rgb(153, 102, 255)', -0.5, 1.0);
+        ldM.addLabel('Útfæra samskiptaleið', 'Koma upp samskiptaleið á milli RPi og iðntölvunnar.')
+            .setDuration('verkefni', 'rgb(153, 102, 255)', 0.25, 2.25);
+        ldM.addLabel('Upplýsingaöflun - HTTPS/OAuth', 'Skoða HTTPS/OAuth og finna leið til að koma upp öruggari tengingu fyrir veraldarvefinn.')
+            .setDuration('verkefni', 'rgb(153, 102, 255)', 0.5, 2.5);
+        ldM.addLabel('Færa samskipti yfir á vefþjónn', 'Færa samskipti af RPi og yfir á vefþjón.')
+            .setDuration('verkefni', 'rgb(153, 102, 255)', -1.0, 2.0);
+        ldM.addLabel('Útbúa viðauka', 'Taka saman og útbúa dæmi sem fara í viðauka, t.d. LHTTP og MQTT í TIA Portal.')
+            .setDuration('verkefni', 'rgb(153, 102, 255)', -0.25, 2.0);
 
-        ldM.add('verkefni', 'rgb(153, 102, 255)', -3.0, 2.0, 'Upplýsingasöfnun - Smith og Norland', 'Hafa samband við Smith og Norland sem er umboðsaðili fyrir Siemens og fá verð á iðntölvum og leyfum.');
-        ldM.add('verkefni', 'rgb(153, 102, 255)', -1.5, 3.0, 'Upplýsingasöfnun - Siemens', 'Setja upp TIA Portal og skoða leiðir sem eru í boði.');
-        ldM.add('verkefni', 'rgb(153, 102, 255)', -1.0, 1.0, 'Útvega leyfi', 'Útvega leyfi fyrir TIA sem og iðntölvu sem hentar fyrir verkefnið.');
-        ldM.add('verkefni', 'rgb(153, 102, 255)', -1.5, 0.5, 'Setja upp Raspberry Pi', 'Setja upp RPi svo hægt sé að prófa ýmsar aðferðir til að tengjast iðntölvunni.');
-        ldM.add('verkefni', 'rgb(153, 102, 255)', 4.0, 2.5, 'Upplýsingaöflun - Vefþjón', 'Skoða hvaða þjónustur bjóða upp á vefþjón á skýi.');
-        ldM.add('verkefni', 'rgb(153, 102, 255)', -1.5, 1.5, 'Upplýsingaöflun - HTTPS samskipti', 'Skoða HTTP samskipti sem og aðrar samskiptaaðferðir til samanburðar (IoT/MQTT).');
-        ldM.add('verkefni', 'rgb(153, 102, 255)', 0.0, 1.0, 'Upplýsingaöflun - Andor ehf', 'Fá verð og hugmyndir frá Andor ehf varðandi mySCADA.');
-        ldM.add('verkefni', 'rgb(153, 102, 255)', -0.5, 1.0, 'Upplýsingaöflun - mySCADA', 'Skoða framboðið hjá mySCADA.');
-        ldM.add('verkefni', 'rgb(153, 102, 255)', 0.25, 2.25, 'Útfæra samskiptaleið', 'Koma upp samskiptaleið á milli RPi og iðntölvunnar.');
-        ldM.add('verkefni', 'rgb(153, 102, 255)', 0.5, 2.5, 'Upplýsingaöflun - HTTPS/OAuth', 'Skoða HTTPS/OAuth og finna leið til að koma upp öruggari tengingu fyrir veraldarvefinn.');
-        ldM.add('verkefni', 'rgb(153, 102, 255)', -1.0, 2.0, 'Færa samskipti yfir á vefþjónn', 'Færa samskipti af RPi og yfir á vefþjón.');
-        ldM.add('verkefni', 'rgb(153, 102, 255)', -0.25, 2.0, 'Útbúa viðauka', 'Taka saman og útbúa dæmi sem fara í viðauka, t.d. LHTTP og MQTT í TIA Portal.');
+        ldM.addLabel(`Heimildaleit og hugtök (alls ${concepts.length} atriði)`, '')
+            .setDuration('hugtok', 'rgb(153, 102, 255)', -1.0, 0.55) // 01
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 02
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 03
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 04
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 05
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 06
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 07
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 08
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 09
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 10
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 11
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 12
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 13
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 14
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 15
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 16
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 17
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 18
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 19
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 20
+            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55); // 21
 
-        ldM.add('hugtok', 'rgb(153, 102, 255)', -1.0, 0.55, `Heimildaleit og hugtök (alls ${concepts.length} atriði)`, '')
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55)
-        .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55);
+        ldM.addLabel('Undirbúa vörn', '', false)
+            .setDuration('vorn', 'rgb(153, 102, 255)', 8.0+_DAY(2), 1.0)
+            .addLayer('vorn', 'rgb(153, 102, 255)', 7.0+_DAY(2), 2.0);
 
-        ldM.add('vorn', 'rgb(153, 102, 255)', 8.0+_DAY(2), 1.0, 'Undirbúa vörn', '', false)
-        .addLayer('vorn', 'rgb(153, 102, 255)', 7.0+_DAY(2), 2.0);
-
+        ldM.setReferencesNumber(1);
         ldM.scaleData(sM.getScale());
         const data = ldM.getChartData( 3.0, 8.0, 1.0, 0.5);
         
@@ -563,6 +620,7 @@
         eM.add(19.0,         'red', "Lokaskil", "Lokaskil, hér á skýslan að vera full búin (22. apríl)."); // 22apr/17+0
         eM.add(21.0+_DAY(4), 'red', "Varnir á lokaverkefni", "Varnir á lokaverkefni, upplýsingar koma seinna (miðjan maí)."); // 10maí/19+4
         eM.add(22.0+_DAY(2), 'red', "Skil á skýrslu inn á skemma.is", "Skil á skýrslu inn á skemma.is eftir vörn, áfanga lokið!"); // 15maí/20+2
+
         eM.setReferencesNumber(ldM.getReferenceCount());
 
 
@@ -626,8 +684,6 @@
         const chart = new Chart(canvas, config);
         chart.update();
 
-        
-
         // HTML - Creating lists:
         const nodeSkil = document.getElementById("skil");
         const nodeSkyrsla = document.getElementById("skyrsla");
@@ -643,20 +699,19 @@
             }
         });
 
-        // Using the JS 'Destructuring assignment' syntax:
-        const {texts} = ldM.getTexts();
-        texts.forEach(function(text, i){
-            if(text === null || text.legend === 0){
-                return;
-            }
-            const node = document.createElement('span');
-            const textnode = document.createTextNode(text);
-            node.appendChild(textnode);
-            if(i < 11){ // 'skyrsla'
-                nodeSkyrsla.appendChild(node);
-            }
-            else if(i < 23){ // 'verkefni'
-                nodeVerkefni.appendChild(node);
+        ldM.getLabelsData().forEach((data, i) => {
+            if(typeof data.text === "string" && data.text.length !== 0){
+                const node = document.createElement('span');
+                const textnode = document.createTextNode(data.text);
+                node.appendChild(textnode);
+
+                const group = ldM.getDurationsData()[0][i].groupID;
+                if(group === 'skyrsla'){
+                    nodeSkyrsla.appendChild(node);
+                }
+                else if(group === 'verkefni'){
+                    nodeVerkefni.appendChild(node);
+                }
             }
         });
 
