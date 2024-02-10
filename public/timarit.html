@@ -52,6 +52,20 @@
             width: max(97vw, 120rem);
             padding: 0rem 1vw;
         }
+        .borderNone{
+            padding-left: 0.25rem;
+            border-left: 0.4rem solid whitesmoke; 
+        }
+        .borderBlue{
+            padding-left: 0.25rem;
+            /*background: linear-gradient(to right, rgba(54, 162, 235, 0.1), white 66%);*/
+            border-left: 0.4rem solid rgba(54, 162, 235, 0.66); 
+        }
+        .borderGreen{
+            padding-left: 0.25rem;
+            /*background: linear-gradient(to right, rgba(76, 187, 23, 0.1), white 66%);*/
+            border-left: 0.4rem solid rgba(76, 187, 23, 0.66); 
+        }
         @media only screen and (max-width: 768px) {
             /* For mobile phones, if the browser window is 768px or smaller. */
             h1 {
@@ -472,11 +486,12 @@
 
 
         // --- Global variables ---
-        const _COLORS = {
+        const _C = {
             red: 'rgb(255, 99, 132)',
             orange: 'rgb(255, 159, 64)',
             yellow: 'rgb(255, 205, 86)',
-            green: 'rgb(75, 192, 192)',
+            lBlue: 'rgb(75, 192, 192)',
+            kellyGreen: 'rgb(76, 187, 23)',
             blue: 'rgb(54, 162, 235)',
             purple: 'rgb(153, 102, 255)',
             grey: 'rgb(201, 203, 207)'
@@ -496,27 +511,27 @@
 
         // --- Text for 'hugtök' ---
         const concepts = [
-            "Skilgreining á kerfum.",
-            "Skilgreining á iðnstýringum.",
-            "Skilgreining á iðntölvum.",
-            "Skilgreining á skjámyndakerfum.",
-            "Skilgreining áGNU/Linux og RPi (Raspberry Pi) smátölvum.",
-            "Skilgreining á HTML (HyperText Markup Language).",
-            "Skilgreining á CSS (Cascading Style Sheets; oft kallað stílsnið).",
-            "Skilgreining á JS (JavaScript).",
-            "Skilgreining á vefþjóni (backend eða bakendi).",
-            "Skilgreining á AWS (Amazon Web Services) og Supabase.",
-            "Skilgreining á vefsíðu (frontend eða framendi).",
-            "Skilgreining á gagnagrunni (Database eða DB).",
-            "Skilgreining á vafra (web-browser).",
-            "Vitna í Mozilla(Firefox), Google(Chrome), Brave eða KDE(Konqueror).",
-            "Skilgreining á HTTP/HTTPS (Hypertext Transfer Protocol /Secure).",
-            "Skilgreining á IoT (The Internet of Things) og MQTT (the standard for IoT messaging).",
-            "Skilgreining á TLS (Transport Layer Security, líka kallað SSL).",
-            "Skilgreining á SVG (Scalable Vector Graphics) og tengingunni við HTML og vafra.",
-            "Skilgreining á Inkscape (vector graphics editor).",
-            "Hvernig nýtist LHTTP safn þegar sett er upp á Siemens Iðntölvu?",
-            "Skilgreining á SCADA staðlinum.",
+            [1, "Skilgreining á kerfum."],
+            [1, "Skilgreining á iðnstýringum."],
+            [1, "Skilgreining á iðntölvum."],
+            [1, "Skilgreining á skjámyndakerfum."],
+            [2, "Skilgreining á GNU/Linux og RPi (Raspberry Pi) smátölvum."],
+            [3, "Skilgreining á HTML (HyperText Markup Language)."],
+            [3, "Skilgreining á CSS (Cascading Style Sheets; oft kallað stílsnið)."],
+            [3, "Skilgreining á JS (JavaScript)."],
+            [3, "Skilgreining á vefþjóni (backend eða bakendi)."],
+            [1, "Skilgreining á AWS (Amazon Web Services) og Supabase."],
+            [1, "Skilgreining á vefsíðu (frontend eða framendi)."],
+            [3, "Skilgreining á gagnagrunni (Database eða DB)."],
+            [3, "Skilgreining á vafra (web-browser)."],
+            [1, "Vitna í Mozilla(Firefox), Google(Chrome), Brave eða KDE(Konqueror)."],
+            [3, "Skilgreining á HTTP/HTTPS (Hypertext Transfer Protocol /Secure)."],
+            [1, "Skilgreining á IoT (The Internet of Things) og MQTT (the standard for IoT messaging)."],
+            [3, "Skilgreining á TLS (Transport Layer Security, líka kallað SSL)."],
+            [1, "Skilgreining á SVG (Scalable Vector Graphics) og tengingunni við HTML og vafra."],
+            [1, "Skilgreining á Inkscape (vector graphics editor)."],
+            [1, "Hvernig nýtist LHTTP safn þegar sett er upp á Siemens Iðntölvu?"],
+            [1, "Skilgreining á SCADA staðlinum."],
         ];
 
 
@@ -529,79 +544,79 @@
         // 2.3. argument = Byrjun tímabils(0 er endir timabilsins á undan).
         // 2.4. argument = Lengd tímabils.
         ldM.addLabel('Velja leið - Siemens', 'Bera saman leiðir og velja ódýrustu leiðina sem Siemens býður upp á til að fjartengjast skjámyndakerfum. Skrifa punkta.')
-            .setDuration('skyrsla', 'rgb(153, 102, 255)', 0.0, 1.5);
+            .setDuration('skyrsla', _C.blue, 0.0, 1.5);
         ldM.addLabel('Kostnaðaráætlun - Siemens', 'Útbúa einhverskonar kostnaðaráætlun byggða á Siemens.')
-            .setDuration('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0);
+            .setDuration('skyrsla', _C.blue, -1.0, 2.0);
         ldM.addLabel('Heimildaleit - Siemens', 'Skoða heimasíðu Siemens vandlega og skrifa texta.')
-            .setDuration('skyrsla', 'rgb(153, 102, 255)', -0.5, 1.5);
+            .setDuration('skyrsla', _C.purple, -0.5, 1.5);
         ldM.addLabel('Heimildaleit - Ský og Firebase', 'Skoða og taka saman upplýsingar um skýjaþjónustur sem og Firebase.')
-            .setDuration('skyrsla', 'rgb(153, 102, 255)', 0.0, 2.0);
+            .setDuration('skyrsla', _C.blue, 0.0, 2.0);
         ldM.addLabel('Heimildaleit - mySCADA', 'Finna upplýsingar og athuga verð fyrir sambærilega aðferð og valin var hjá Siemens. Skrifa punkta.')
-            .setDuration('skyrsla', 'rgb(153, 102, 255)', -1.0, 1.0);
+            .setDuration('skyrsla', _C.purple, -1.0, 1.0);
         ldM.addLabel('Skipulag skýrslu', 'Ákveða hvaða efni á að vera til umfjöllunar í 1. inngangi, í 2. meginmál eða í 2.5 tilraunaverkefnið.')
-            .setDuration('skyrsla', 'rgb(153, 102, 255)', 0.0, 2.0);
+            .setDuration('skyrsla', _C.kellyGreen, 0.0, 2.0);
         ldM.addLabel('Tilraunaverkefnið', 'Byrja á texta um tilraunaverkefnið.')
-            .setDuration('skyrsla', 'rgb(153, 102, 255)', 0.0, 4.0);
+            .setDuration('skyrsla', _C.purple, 0.0, 4.0);
         ldM.addLabel('Lokaorð og samantekt', 'Skrifa lokaorð og samantekt.')
-            .setDuration('skyrsla', 'rgb(153, 102, 255)', -2.0, 2.0);
+            .setDuration('skyrsla', _C.purple, -2.0, 2.0);
         ldM.addLabel('Formáli og inngangur', 'Skrifa formála og inngang.')
-            .setDuration('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0);
+            .setDuration('skyrsla', _C.purple, -1.0, 2.0);
         ldM.addLabel('Samstilling', 'Samstilla og yfirfara allan texta sem kominn er.')
-            .setDuration('skyrsla', 'rgb(153, 102, 255)', -4.0, 6.0);
+            .setDuration('skyrsla', _C.purple, -4.0, 6.0);
         ldM.addLabel('Heimildaskrá og almennur frágangur', 'Yfirfara heimildaskrá og yfirfara skýrslu í heild.')
-            .setDuration('skyrsla', 'rgb(153, 102, 255)', -1.0, 2.0);
+            .setDuration('skyrsla', _C.purple, -1.0, 2.0);
         
         ldM.addLabel('Upplýsingasöfnun - Smith og Norland', 'Hafa samband við Smith og Norland sem er umboðsaðili fyrir Siemens og fá verð á iðntölvum og leyfum.')
-            .setDuration('verkefni', 'rgb(153, 102, 255)', -3.0, 2.0);
+            .setDuration('verkefni', _C.kellyGreen, -3.0, 2.0);
         ldM.addLabel('Upplýsingasöfnun - Siemens', 'Setja upp TIA Portal og skoða leiðir sem eru í boði.')
-            .setDuration('verkefni', 'rgb(153, 102, 255)', -1.5, 3.0);
+            .setDuration('verkefni', _C.blue, -1.5, 3.0);
         ldM.addLabel('Útvega leyfi', 'Útvega leyfi fyrir TIA sem og iðntölvu sem hentar fyrir verkefnið.')
-            .setDuration('verkefni', 'rgb(153, 102, 255)', -1.0, 1.0);
+            .setDuration('verkefni', _C.kellyGreen, -1.0, 1.0);
         ldM.addLabel('Setja upp Raspberry Pi', 'Setja upp RPi svo hægt sé að prófa ýmsar aðferðir til að tengjast iðntölvunni.')
-            .setDuration('verkefni', 'rgb(153, 102, 255)', -1.5, 0.5);
+            .setDuration('verkefni', _C.blue, -1.5, 0.5);
         ldM.addLabel('Upplýsingaöflun - Vefþjón', 'Skoða hvaða þjónustur bjóða upp á vefþjón á skýi.')
-            .setDuration('verkefni', 'rgb(153, 102, 255)', 4.0, 2.5);
+            .setDuration('verkefni', _C.kellyGreen, 4.0, 2.5);
         ldM.addLabel('Upplýsingaöflun - HTTPS samskipti', 'Skoða HTTP samskipti sem og aðrar samskiptaaðferðir til samanburðar (IoT/MQTT).')
-            .setDuration('verkefni', 'rgb(153, 102, 255)', -1.5, 1.5);
+            .setDuration('verkefni', _C.blue, -1.5, 1.5);
         ldM.addLabel('Upplýsingaöflun - Andor ehf', 'Fá verð og hugmyndir frá Andor ehf varðandi mySCADA.')
-            .setDuration('verkefni', 'rgb(153, 102, 255)', 0.0, 1.0);
+            .setDuration('verkefni', _C.kellyGreen, 0.0, 1.0);
         ldM.addLabel('Upplýsingaöflun - mySCADA', 'Skoða framboðið hjá mySCADA.')
-            .setDuration('verkefni', 'rgb(153, 102, 255)', -0.5, 1.0);
+            .setDuration('verkefni', _C.purple, -0.5, 1.0);
         ldM.addLabel('Útfæra samskiptaleið', 'Koma upp samskiptaleið á milli RPi og iðntölvunnar.')
-            .setDuration('verkefni', 'rgb(153, 102, 255)', 0.25, 2.25);
+            .setDuration('verkefni', _C.purple, 0.25, 2.25);
         ldM.addLabel('Upplýsingaöflun - HTTPS/OAuth', 'Skoða HTTPS/OAuth og finna leið til að koma upp öruggari tengingu fyrir veraldarvefinn.')
-            .setDuration('verkefni', 'rgb(153, 102, 255)', 0.5, 2.5);
+            .setDuration('verkefni', _C.purple, 0.5, 2.5);
         ldM.addLabel('Færa samskipti yfir á vefþjónn', 'Færa samskipti af RPi og yfir á vefþjón.')
-            .setDuration('verkefni', 'rgb(153, 102, 255)', -1.0, 2.0);
+            .setDuration('verkefni', _C.purple, -1.0, 2.0);
         ldM.addLabel('Útbúa viðauka', 'Taka saman og útbúa dæmi sem fara í viðauka, t.d. LHTTP og MQTT í TIA Portal.')
-            .setDuration('verkefni', 'rgb(153, 102, 255)', -0.25, 2.0);
+            .setDuration('verkefni', _C.purple, -0.25, 2.0);
 
         ldM.addLabel(`Heimildaleit og hugtök (alls ${concepts.length} atriði)`, '')
-            .setDuration('hugtok', 'rgb(153, 102, 255)', -1.0, 0.55) // 01
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 02
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 03
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 04
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 05
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 06
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 07
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 08
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 09
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 10
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 11
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 12
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 13
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 14
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 15
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 16
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 17
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 18
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 19
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55) // 20
-            .addLayer('hugtok', 'rgb(153, 102, 255)', 0.0, 0.55); // 21
+            .setDuration('hugtok', _C.kellyGreen, -1.0, 0.55) // 01
+            .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 02
+            .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 03
+            .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 04
+            .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 05
+            .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 06
+            .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 07
+            .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 08
+            .addLayer('hugtok', _C.blue, 0.0, 0.55) // 09
+            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 10
+            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 11
+            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 12
+            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 13
+            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 14
+            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 15
+            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 16
+            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 17
+            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 18
+            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 19
+            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 20
+            .addLayer('hugtok', _C.purple, 0.0, 0.55); // 21
 
         ldM.addLabel('Undirbúa vörn', '', false)
-            .setDuration('vorn', 'rgb(153, 102, 255)', 8.0+_DAY(2), 1.0)
-            .addLayer('vorn', 'rgb(153, 102, 255)', 7.0+_DAY(2), 2.0);
+            .setDuration('vorn', _C.purple, 8.0+_DAY(2), 1.0)
+            .addLayer('vorn', _C.purple, 7.0+_DAY(2), 2.0);
 
         ldM.setReferencesNumber(1);
         ldM.scaleData(sM.getScale());
@@ -614,7 +629,7 @@
         eM.add(0.0+_DAY(4),'green', "Umsókn um lokaverkefni", "Fylla inn umsókn um lokaverkefni (15. desember 2023)."); // 15des/11+4
         eM.add(6.0,        'green', "Uppsetning skýrslu og verkáætlun", "a) Setja upp skýrslu og ákveða kaflaskiptingu. b) Útbúa Gantt rit og skipuleggja tíma (22. janúar)."); // 22des/04+0
         eM.add(6.0+_DAY(4), 'gray', "IEEE heimildanotkun fyrirlestur", "Fyrirlestur frá skólanum um IEEE heimildanotkun (26. janúar - 1 klst 12:00-13:00)."); // 26jan/04+4
-        eM.add(9.0,          'red', "Fyrri áfangaskil", "Vera búinn að vinna í gegnum kaflana í meginmáli (12. febrúar)."); // 12feb/07+0
+        eM.add(9.0,        'green', "Fyrri áfangaskil", "Vera búinn að vinna í gegnum kaflana í meginmáli (12. febrúar)."); // 12feb/07+0
         eM.add(11.0,         'red', "Seinni áfangaskil", "Fræðin og undirbúningur fyrir úrvinnslu á mælingum og/eða gögnum á að liggja að mestu fyrir í skýrslunni (26. febrúar)."); // 26feb/09+0
         eM.add(12.0+_DAY(2), 'red', "Miðannarvörn á seinni skilum", "Kynning + powerpoint og spurningar frá kennara (4. mars - 8. mars )."); // 04mar/10+2
         eM.add(19.0,         'red', "Lokaskil", "Lokaskil, hér á skýslan að vera full búin (22. apríl)."); // 22apr/17+0
@@ -702,6 +717,16 @@
         ldM.getLabelsData().forEach((data, i) => {
             if(typeof data.text === "string" && data.text.length !== 0){
                 const node = document.createElement('span');
+
+                const color = ldM.getDurationsData()[0][i].color;
+                if(color == _C.blue){
+                    node.classList.add("borderBlue");
+                }
+                else if(color == _C.kellyGreen){
+                    node.classList.add("borderGreen");
+                }
+                node.classList.add("borderNone");
+
                 const textnode = document.createTextNode(data.text);
                 node.appendChild(textnode);
 
@@ -717,7 +742,16 @@
 
         concepts.forEach(function(item, i){
             const node = document.createElement('span');
-            const textnode = document.createTextNode((i+1) +". "+ item);
+
+            if(item[0] === 2){
+                node.classList.add("borderBlue");
+            }
+            else if(item[0] === 3){
+                node.classList.add("borderGreen");
+            }
+            node.classList.add("borderNone");
+
+            const textnode = document.createTextNode((i+1) +". "+ item[1]);
             node.appendChild(textnode);
             nodeHugtok.appendChild(node);
         });
