@@ -24,7 +24,8 @@
         }
         h1 {
             font-size: 2.5vw;
-            padding: 4rem 10vw
+            padding: 4rem 10vw;
+            margin: 3rem 0 0 0;
         }
         .grid-container {
             display: grid;
@@ -43,15 +44,6 @@
             text-align: left;
             font-size: 1.2rem;
         }
-        #bil {
-            height: 3rem;
-        }
-        #chart-container{
-            position: relative;
-            height: 80vh;
-            width: max(97vw, 120rem);
-            padding: 0rem 1vw;
-        }
         .borderNone{
             padding-left: 0.25rem;
             border-left: 0.4rem solid whitesmoke; 
@@ -65,6 +57,54 @@
             padding-left: 0.25rem;
             /*background: linear-gradient(to right, rgba(76, 187, 23, 0.1), white 66%);*/
             border-left: 0.4rem solid rgba(76, 187, 23, 0.66); 
+        }
+
+        #bil {
+            height: 3rem;
+        }
+
+        .label-container{
+            display: flex; /* or inline-flex */
+            flex-direction: row; /* row | row-reverse | column | column-reverse */
+            align-items: center;
+            justify-content: space-around; /* pace-between | space-around | space-evenly | flex-start | flex-end | center */
+            width: max(50vw, 80rem);
+            padding: 0 0 2rem 10vw;
+
+        }
+        .label-container > fieldset {
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .label-container > fieldset > div {
+            height: 1.5rem;
+            width: 8rem;
+            border-radius: 0.8rem;
+        }
+        .label-container > fieldset > p {
+            font-size: 1.2rem;
+            padding-left: 1rem;
+        }
+        .label-purple{
+            background: rgba(153, 102, 255, 0.5);
+            border: 0.33rem solid rgb(153, 102, 255);
+        }
+        .label-blue{
+            background: rgba(54, 162, 235, 0.5);
+            border: 0.33rem solid rgb(54, 162, 235);
+        }
+        .label-green{
+            background: rgba(76, 187, 23, 0.5);
+            border: 0.33rem solid rgb(76, 187, 23);       
+        }
+
+        #chart-container{
+            position: relative;
+            height: 80vh;
+            width: max(97vw, 120rem);
+            padding: 0rem 1vw;
         }
         @media only screen and (max-width: 768px) {
             /* For mobile phones, if the browser window is 768px or smaller. */
@@ -116,6 +156,11 @@
 	<div id="bil"></div>
 
         <h1>Verkáætlun fyrir lokaverkefni</h1>
+        <div class="label-container">
+            <fieldset> <div class="label-purple"></div> <p>Á frumstigi</p> </fieldset>
+            <fieldset> <div class="label-blue"></div> <p>Í vinnslu</p> </fieldset>
+            <fieldset> <div class="label-green"></div> <p>Á lokastigi</p> </fieldset>
+        </div>
         <div id="chart-container">
             <canvas id="chart"></canvas>
         </div>
@@ -511,27 +556,27 @@
 
         // --- Text for 'hugtök' ---
         const concepts = [
-            [1, "Skilgreining á kerfum."],
-            [1, "Skilgreining á iðnstýringum."],
-            [1, "Skilgreining á iðntölvum."],
-            [1, "Skilgreining á skjámyndakerfum."],
-            [2, "Skilgreining á GNU/Linux og RPi (Raspberry Pi) smátölvum."],
-            [3, "Skilgreining á HTML (HyperText Markup Language)."],
-            [3, "Skilgreining á CSS (Cascading Style Sheets; oft kallað stílsnið)."],
-            [3, "Skilgreining á JS (JavaScript)."],
-            [3, "Skilgreining á vefþjóni (backend eða bakendi)."],
-            [1, "Skilgreining á AWS (Amazon Web Services) og Supabase."],
-            [1, "Skilgreining á vefsíðu (frontend eða framendi)."],
-            [3, "Skilgreining á gagnagrunni (Database eða DB)."],
-            [3, "Skilgreining á vafra (web-browser)."],
-            [1, "Vitna í Mozilla(Firefox), Google(Chrome), Brave eða KDE(Konqueror)."],
-            [3, "Skilgreining á HTTP/HTTPS (Hypertext Transfer Protocol /Secure)."],
-            [1, "Skilgreining á IoT (The Internet of Things) og MQTT (the standard for IoT messaging)."],
-            [3, "Skilgreining á TLS (Transport Layer Security, líka kallað SSL)."],
-            [1, "Skilgreining á SVG (Scalable Vector Graphics) og tengingunni við HTML og vafra."],
-            [1, "Skilgreining á Inkscape (vector graphics editor)."],
-            [1, "Hvernig nýtist LHTTP safn þegar sett er upp á Siemens Iðntölvu?"],
-            [1, "Skilgreining á SCADA staðlinum."],
+            [2, "Skilgreining á kerfum."], // 01
+            [1, "Skilgreining á iðnstýringum."], // 02
+            [1, "Skilgreining á iðntölvum."], // 03
+            [1, "Skilgreining á skjámyndakerfum."], // 04
+            [2, "Skilgreining á GNU/Linux og RPi (Raspberry Pi) smátölvum."], // 05
+            [3, "Skilgreining á HTML (HyperText Markup Language)."], // 06
+            [3, "Skilgreining á CSS (Cascading Style Sheets; oft kallað stílsnið)."], // 07
+            [3, "Skilgreining á JS (JavaScript)."], // 08
+            [3, "Skilgreining á vefþjóni (backend eða bakendi)."], // 09
+            [1, "Skilgreining á AWS (Amazon Web Services) og Supabase."], // 10
+            [1, "Skilgreining á vefsíðu (frontend eða framendi)."], // 11
+            [3, "Skilgreining á gagnagrunni (Database eða DB)."], // 12
+            [3, "Skilgreining á vafra (web-browser)."], // 13
+            [1, "Vitna í Mozilla(Firefox), Google(Chrome), Brave eða KDE(Konqueror)."], // 14
+            [3, "Skilgreining á HTTP/HTTPS (Hypertext Transfer Protocol /Secure)."], // 15
+            [1, "Skilgreining á IoT (The Internet of Things) og MQTT (the standard for IoT messaging)."], // 16
+            [3, "Skilgreining á TLS (Transport Layer Security, líka kallað SSL)."], // 17
+            [1, "Skilgreining á SVG (Scalable Vector Graphics) og tengingunni við HTML og vafra."], // 18
+            [1, "Skilgreining á Inkscape (vector graphics editor)."], // 19
+            [1, "Hvernig nýtist LHTTP safn þegar sett er upp á Siemens Iðntölvu?"], // 20
+            [1, "Skilgreining á SCADA staðlinum."], // 21
         ];
 
 
@@ -569,7 +614,7 @@
         ldM.addLabel('Upplýsingasöfnun - Smith og Norland', 'Hafa samband við Smith og Norland sem er umboðsaðili fyrir Siemens og fá verð á iðntölvum og leyfum.')
             .setDuration('verkefni', _C.kellyGreen, -3.0, 2.0);
         ldM.addLabel('Upplýsingasöfnun - Siemens', 'Setja upp TIA Portal og skoða leiðir sem eru í boði.')
-            .setDuration('verkefni', _C.blue, -1.5, 3.0);
+            .setDuration('verkefni', _C.kellyGreen, -1.5, 3.0);
         ldM.addLabel('Útvega leyfi', 'Útvega leyfi fyrir TIA sem og iðntölvu sem hentar fyrir verkefnið.')
             .setDuration('verkefni', _C.kellyGreen, -1.0, 1.0);
         ldM.addLabel('Setja upp Raspberry Pi', 'Setja upp RPi svo hægt sé að prófa ýmsar aðferðir til að tengjast iðntölvunni.')
@@ -601,7 +646,7 @@
             .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 07
             .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 08
             .addLayer('hugtok', _C.blue, 0.0, 0.55) // 09
-            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 10
+            .addLayer('hugtok', _C.blue, 0.0, 0.55) // 10
             .addLayer('hugtok', _C.purple, 0.0, 0.55) // 11
             .addLayer('hugtok', _C.purple, 0.0, 0.55) // 12
             .addLayer('hugtok', _C.purple, 0.0, 0.55) // 13
