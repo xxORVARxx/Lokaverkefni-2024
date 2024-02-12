@@ -556,9 +556,9 @@
 
         // --- Text for 'hugtök' ---
         const concepts = [
-            [2, "Skilgreining á kerfum."], // 01
-            [1, "Skilgreining á iðnstýringum."], // 02
-            [1, "Skilgreining á iðntölvum."], // 03
+            [3, "Skilgreining á kerfum."], // 01
+            [3, "Skilgreining á iðnstýringum."], // 02
+            [3, "Skilgreining á iðntölvum."], // 03
             [1, "Skilgreining á skjámyndakerfum."], // 04
             [2, "Skilgreining á GNU/Linux og RPi (Raspberry Pi) smátölvum."], // 05
             [3, "Skilgreining á HTML (HyperText Markup Language)."], // 06
@@ -573,7 +573,7 @@
             [3, "Skilgreining á HTTP/HTTPS (Hypertext Transfer Protocol /Secure)."], // 15
             [1, "Skilgreining á IoT (The Internet of Things) og MQTT (the standard for IoT messaging)."], // 16
             [3, "Skilgreining á TLS (Transport Layer Security, líka kallað SSL)."], // 17
-            [1, "Skilgreining á SVG (Scalable Vector Graphics) og tengingunni við HTML og vafra."], // 18
+            [2, "Skilgreining á SVG (Scalable Vector Graphics) og tengingunni við HTML og vafra."], // 18
             [1, "Skilgreining á Inkscape (vector graphics editor)."], // 19
             [1, "Hvernig nýtist LHTTP safn þegar sett er upp á Siemens Iðntölvu?"], // 20
             [1, "Skilgreining á SCADA staðlinum."], // 21
@@ -589,7 +589,7 @@
         // 2.3. argument = Byrjun tímabils(0 er endir timabilsins á undan).
         // 2.4. argument = Lengd tímabils.
         ldM.addLabel('Velja leið - Siemens', 'Bera saman leiðir og velja ódýrustu leiðina sem Siemens býður upp á til að fjartengjast skjámyndakerfum. Skrifa punkta.')
-            .setDuration('skyrsla', _C.blue, 0.0, 1.5);
+            .setDuration('skyrsla', _C.kellyGreen, 0.0, 1.5);
         ldM.addLabel('Kostnaðaráætlun - Siemens', 'Útbúa einhverskonar kostnaðaráætlun byggða á Siemens.')
             .setDuration('skyrsla', _C.blue, -1.0, 2.0);
         ldM.addLabel('Heimildaleit - Siemens', 'Skoða heimasíðu Siemens vandlega og skrifa texta.')
@@ -605,7 +605,7 @@
         ldM.addLabel('Lokaorð og samantekt', 'Skrifa lokaorð og samantekt.')
             .setDuration('skyrsla', _C.purple, -2.0, 2.0);
         ldM.addLabel('Formáli og inngangur', 'Skrifa formála og inngang.')
-            .setDuration('skyrsla', _C.purple, -1.0, 2.0);
+            .setDuration('skyrsla', _C.blue, -1.0, 2.0);
         ldM.addLabel('Samstilling', 'Samstilla og yfirfara allan texta sem kominn er.')
             .setDuration('skyrsla', _C.purple, -4.0, 6.0);
         ldM.addLabel('Heimildaskrá og almennur frágangur', 'Yfirfara heimildaskrá og yfirfara skýrslu í heild.')
@@ -645,11 +645,11 @@
             .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 06
             .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 07
             .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 08
-            .addLayer('hugtok', _C.blue, 0.0, 0.55) // 09
-            .addLayer('hugtok', _C.blue, 0.0, 0.55) // 10
-            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 11
-            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 12
-            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 13
+            .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 09
+            .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 10
+            .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 11
+            .addLayer('hugtok', _C.blue, 0.0, 0.55) // 12
+            .addLayer('hugtok', _C.blue, 0.0, 0.55) // 13
             .addLayer('hugtok', _C.purple, 0.0, 0.55) // 14
             .addLayer('hugtok', _C.purple, 0.0, 0.55) // 15
             .addLayer('hugtok', _C.purple, 0.0, 0.55) // 16
@@ -753,6 +753,9 @@
         eM.getTexts().forEach(function(text, i){
             if(text){
                 const node = document.createElement('span');
+                i <= 5 ? 
+                    node.classList.add("borderGreen") : 
+                    node.classList.add("borderNone");
                 const textnode = document.createTextNode(text);
                 node.appendChild(textnode);
                 nodeSkil.appendChild(node);
@@ -761,17 +764,13 @@
 
         ldM.getLabelsData().forEach((data, i) => {
             if(typeof data.text === "string" && data.text.length !== 0){
-                const node = document.createElement('span');
-
                 const color = ldM.getDurationsData()[0][i].color;
-                if(color == _C.blue){
-                    node.classList.add("borderBlue");
-                }
-                else if(color == _C.kellyGreen){
-                    node.classList.add("borderGreen");
-                }
-                node.classList.add("borderNone");
-
+                const node = document.createElement('span');
+                color == _C.blue ? 
+                    node.classList.add("borderBlue") : 
+                    color == _C.kellyGreen ? 
+                        node.classList.add("borderGreen") : 
+                        node.classList.add("borderNone");
                 const textnode = document.createTextNode(data.text);
                 node.appendChild(textnode);
 
@@ -787,15 +786,11 @@
 
         concepts.forEach(function(item, i){
             const node = document.createElement('span');
-
-            if(item[0] === 2){
-                node.classList.add("borderBlue");
-            }
-            else if(item[0] === 3){
-                node.classList.add("borderGreen");
-            }
-            node.classList.add("borderNone");
-
+            item[0] === 2 ? 
+                    node.classList.add("borderBlue") : 
+                    item[0] === 3 ? 
+                        node.classList.add("borderGreen") : 
+                        node.classList.add("borderNone");
             const textnode = document.createTextNode((i+1) +". "+ item[1]);
             node.appendChild(textnode);
             nodeHugtok.appendChild(node);
