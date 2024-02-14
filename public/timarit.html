@@ -235,11 +235,13 @@
                 //   element: Element,  // The chart element (point, arc, bar, etc.) for this tooltip item.
                 // }
                 labelCallback(item){
-                    //console.log('item: ', item);
+                    //console.log('item: ', item.chart.durationsData[item.datasetIndex][item.dataIndex]);
+                    const begin = item.chart.durationsData[item.datasetIndex][item.dataIndex].begin;
+                    const end = item.chart.durationsData[item.datasetIndex][item.dataIndex].end;
                     let weeks, days, str;
-                    [weeks, days] = convertWeeksToWeeksAndDays(item.raw[0], startPoint + zeroOrOne);
+                    [weeks, days] = convertWeeksToWeeksAndDays(begin, zeroOrOne);
                     str = `  Frá viku: ${weeks} og ${days} dagar  -  `;
-                    [weeks, days] = convertWeeksToWeeksAndDays(item.raw[1], startPoint + zeroOrOne);
+                    [weeks, days] = convertWeeksToWeeksAndDays(end, zeroOrOne);
                     str += `til viku: ${weeks} og ${days} dagar.`;
                     return item.formattedValue = str;
                 },
@@ -360,25 +362,26 @@
                                     const labelPos = labelsData[labelsData.length-1].pos;
                                     // If 'groupPos' is behind 'labelPos': then use 'labelPos',
                                     // but if 'groupPos' is further ahead; then use 'groupPos'.
-                                    const pos = Math.max(0.0, groupPos - labelPos); //<-Not accepting a number below zero.
+                                    let pos = Math.max(0.0, groupPos - labelPos); //<-Not accepting a number below zero.
                                     // If this is not the first 'duration', negative position is not possible,
                                     // because this 'duration' begins where the last one ended.
                                     const begin = Math.max(0.0, pos + move); //<-Not accepting a number below zero.
                                     const end = begin + duration;
+                                    durations[depth].push([begin, end]);
 
+                                    pos = labelsData[labelsData.length-1].pos;
                                     labelsData[labelsData.length-1].pos += end;
                                     groups[groupID] = labelsData[labelsData.length-1].pos;
-                                    durations[depth].push([begin, end]);
-                                    durationsData[depth].push(new DurationData(begin, end, groupID, groups[groupID], color, obj));
+                                    durationsData[depth].push(new DurationData(pos + begin, pos + end, groupID, groups[groupID], color, obj));
 
                                     return this;
                                 },
                             };
                         },
                     };
-                    // Now to explain these two functions, 'add' and 'addLayer': (they both add a 'duration' to the chart)
-                    // 'add' is used to add a row to the to the first column, each row has a corresponding label.
-                    // 'addLayer' will add a column and place the 'duration' at the current row.
+                    // Now to explain these three functions:
+                    // 'addLabel' adds new row at the bottom of the chart.
+                    // 'setDuration' and 'addLayer' adds 'durations' to the bottom row.
                     // 'depth' is the number of columns the chart has.
                 },
                 scaleData(scale){
@@ -426,7 +429,7 @@
                             borderWidth: borderWidth,
                             borderRadius: borderRadius,
                             borderColor: colors,
-                            backgroundColor: alphaColors, //alphaColors,
+                            backgroundColor: alphaColors,
                             barPercentage: barPercentage,
                         });
                     }
@@ -665,7 +668,6 @@
 
         ldM.setReferencesNumber(1);
         ldM.scaleData(sM.getScale());
-        const data = ldM.getChartData( 3.0, 8.0, 1.0, 0.5);
         
 
 
@@ -688,7 +690,8 @@
         // Configuration for the ChartJS:
         const config = {
             type: 'bar',
-            data: data,
+            //                    (borderWidth, borderRadius, barPercentage, opacity)
+            data: ldM.getChartData(3.0, 8.0, 1.0, 0.5),
             options: {
                 indexAxis: 'y',
                 responsive: true,
@@ -743,6 +746,10 @@
         const canvas = document.getElementById('chart');
         const chart = new Chart(canvas, config);
         chart.update();
+        // Adding my own data to the ChartJS object:
+        chart['durationsData'] = ldM.getDurationsData();
+
+
 
         // HTML - Creating lists:
         const nodeSkil = document.getElementById("skil");
