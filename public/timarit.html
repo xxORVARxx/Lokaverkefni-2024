@@ -562,19 +562,19 @@
             [3, "Skilgreining á kerfum."], // 01
             [3, "Skilgreining á iðnstýringum."], // 02
             [3, "Skilgreining á iðntölvum."], // 03
-            [1, "Skilgreining á skjámyndakerfum."], // 04
+            [3, "Skilgreining á skjámyndakerfum."], // 04
             [3, "Skilgreining á GNU/Linux og RPi (Raspberry Pi) smátölvum."], // 05
             [3, "Skilgreining á HTML (HyperText Markup Language)."], // 06
             [3, "Skilgreining á CSS (Cascading Style Sheets; oft kallað stílsnið)."], // 07
             [3, "Skilgreining á JS (JavaScript)."], // 08
             [3, "Skilgreining á vefþjóni (backend eða bakendi)."], // 09
             [1, "Skilgreining á AWS (Amazon Web Services) og Supabase."], // 10
-            [2, "Skilgreining á vefsíðu (frontend eða framendi)."], // 11
+            [1, "Skilgreining á vefsíðu (frontend eða framendi)."], // 11
             [3, "Skilgreining á gagnagrunni (Database eða DB)."], // 12
             [3, "Skilgreining á vafra (web-browser)."], // 13
             [2, "Vitna í Mozilla(Firefox), Google(Chrome), Brave eða KDE(Konqueror)."], // 14
             [3, "Skilgreining á HTTP/HTTPS (Hypertext Transfer Protocol /Secure)."], // 15
-            [1, "Skilgreining á IoT (The Internet of Things) og MQTT (the standard for IoT messaging)."], // 16
+            [3, "Skilgreining á IoT (The Internet of Things) og MQTT (the standard for IoT messaging)."], // 16
             [3, "Skilgreining á TLS (Transport Layer Security, líka kallað SSL)."], // 17
             [2, "Skilgreining á SVG (Scalable Vector Graphics) og tengingunni við HTML og vafra."], // 18
             [1, "Skilgreining á Inkscape (vector graphics editor)."], // 19
@@ -606,11 +606,11 @@
         ldM.addLabel('Tilraunaverkefnið', 'Byrja á texta um tilraunaverkefnið.')
             .setDuration('skyrsla', _C.blue, 0.0, 4.0);
         ldM.addLabel('Lokaorð og samantekt', 'Skrifa lokaorð og samantekt.')
-            .setDuration('skyrsla', _C.purple, -2.0, 2.0);
+            .setDuration('skyrsla', _C.purple, -1.5, 2.0);
         ldM.addLabel('Formáli og inngangur', 'Skrifa formála og inngang.')
             .setDuration('skyrsla', _C.blue, -1.0, 2.0);
         ldM.addLabel('Samstilling', 'Samstilla og yfirfara allan texta sem kominn er.')
-            .setDuration('skyrsla', _C.purple, -3.0, 5.0);
+            .setDuration('skyrsla', _C.purple, -3.0, 4.5);
         ldM.addLabel('Heimildaskrá og almennur frágangur', 'Yfirfara heimildaskrá og yfirfara skýrslu í heild.')
             .setDuration('skyrsla', _C.purple, -1.0, 2.0);
         
@@ -652,11 +652,11 @@
             .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 10
             .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 11
             .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 12
-            .addLayer('hugtok', _C.blue, 2.0+_DAY(2), 0.55) // 13
-            .addLayer('hugtok', _C.blue, 0.0, 0.55) // 14
-            .addLayer('hugtok', _C.blue, 1.0, 0.55) // 15
-            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 16
-            .addLayer('hugtok', _C.purple, 0.0, 0.55) // 17
+            .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 13
+            .addLayer('hugtok', _C.kellyGreen, 0.0, 0.55) // 14
+            .addLayer('hugtok', _C.blue, 1.0+_DAY(1), 0.55) // 15
+            .addLayer('hugtok', _C.blue, 0.0, 0.55) // 16
+            .addLayer('hugtok', _C.purple, 1.0+_DAY(1), 0.55) // 17
             .addLayer('hugtok', _C.purple, 0.0, 0.55) // 18
             .addLayer('hugtok', _C.purple, 0.0, 0.55) // 19
             .addLayer('hugtok', _C.purple, 0.0, 0.55) // 20
