@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!--Tell any browser that this file is UTF-8 encoded:-->
+        <meta charset="utf-8">
+        <!--Let browser know website is optimized for mobile:-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!--Tell Microsoft Internet Explorer to use the latest rendering engine: (edge)-->
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>A Clever Sticky Footer Technique.</title>
+        <!--Internal CSS style sheet:-->
+        <style>
+            :root{
+                /* Set the font-size to 62.5% to makes it easier to working with 'rem'.*/
+                /* 62.5% font-size is equal to 10px and 1rem in most browsers*/
+                font-size: 62.5%; /* 62.5% == 10px == 1rem */
+                color: #92cceb;
+            }
+            html, body{
+                margin: 0;
+                height: 100%; /* Sticky footer technique.*/
+                background-color: #112537;
+            }
+            h1, h2{
+                color: #ED7D31;
+            }
+            ul{
+                display: flex; /* or inline-flex */
+                flex-direction: row; /* row-reverse | column | column-reverse */
+                flex-wrap: wrap; /* or nowrap | wrap-reverse */
+                justify-content: center; /* or flex-start | flex-end | space-between | space-around | space-evenly */
+                gap: 5vw;
+                list-style-type: none; /* Remove bullets.*/
+                padding: 0;
+            }
+            li{
+                display: flex; /* or inline-flex.*/
+                justify-content: center;
+                align-items: center;
+                width: 18rem;
+                height: 5rem;
+                border-radius: 1rem;
+                border: 0.3rem outset #ED7D31;
+                background-color: #112537;
+            }
+            main > *{
+                margin: 3rem 15vw;
+            }
+            #container{
+                width: inherit;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+            .content{
+                width: inherit;
+                display: grid;
+                grid-template-columns: minmax(7rem, 12%) 
+                    minmax(25rem, 30%)
+                    minmax(20rem, 25%);
+                justify-content: center;
+                align-items: center;
+            }
+            .content:hover{
+                border-bottom: 0.2rem solid #ED7D31;
+                margin-bottom: -0.2rem;
+            }
+            .content > *{
+                margin: 0.5rem 2rem;
+            }
+            body > footer{
+                position: sticky; /* Sticky footer technique.*/
+                top: 100vh; /* Sticky footer technique.*/
+            }
+            header, footer{
+                padding: 2rem; /* equals 20px.*/
+                background-color: #132b40;
+            }
+        </style>
+        <script type="text/javascript">
+            function generateRandomHexString(len){
+                return Array.from({ length: len }, () => 
+                    "0123456789ABCDEF".charAt(Math.floor(Math.random() * 16))).join('');
+            }
+            function createItem(tag, data){
+                const n = document.createElement(tag);
+                const t = document.createTextNode(data);
+                n.appendChild(t);
+                return n;
+            }
+            document.addEventListener('DOMContentLoaded', () => {
+                const addButton = document.getElementById("add-content");
+                const removeButton = document.getElementById("remove-content");
+                const container = document.getElementById("container");
+
+                addButton.addEventListener("click", () => {
+                    console.log("Add Button Pressed.");
+                    const node = document.createElement('div');
+                    node.classList.add("content");
+                    node.appendChild(createItem('h2', --container.childElementCount));
+                    node.appendChild(createItem('p', generateRandomHexString(32)));
+                    node.appendChild(createItem('h3', new Date().toISOString()));
+                    container.appendChild(node);
+                });
+                
+                removeButton.addEventListener("click", () => {
+                    console.log("Remove Button Pressed.");
+                    if(container.childElementCount > 1){
+                        container.removeChild(container.lastElementChild);
+                    }
+                });
+            });
+        </script>
+    </head>
+
+    <header>
+        <ul>
+            <li><h3>HEADER</h3></li>
+            <li id="add-content"><h2>Add Content</h2></li>
+            <li id="remove-content"><h2>Remove Content</h2></li>
+        </ul>
+    </header>
+    <main>
+        <h1>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptatem vel cumque quis animi nisi, odit totam laborum quam molestias sed quidem, dolorum deleniti quae possimus obcaecati eaque praesentium alias! Aperiam.</h1>
+        <div id="container">
+            <div class="content"><h2>INDEX</h2> <h2>ID</h2> <h2>TIME</h2></div>
+            <div class="content"><h2>0</h2> <p>A5D4CE975DC3541F789B726FCFFE36AD</p> <h3>2024-03-03T13:30:57.385Z</h3></div>
+            <div class="content"><h2>1</h2> <p>788CB0FD9A424CCF9B97179E2D030B0C</p> <h3>2024-03-03T14:41:31.364Z</h3></div>
+            <div class="content"><h2>2</h2> <p>1D1C95D710F3B35DBA7A08EBE80E20AA</p> <h3>2024-03-03T16:01:44.428Z</h3></div>
+        </div>
+        <p>Voluptatum eligendi totam, beatae ut ea, minus aut voluptate atque eaque maiores officiis praesentium aperiam impedit consectetur vero quia at nostrum? Similique dolorem cupiditate quis veniam! Soluta assumenda voluptatum delectus.</p>    
+    </main>
+    <footer>
+         <ul>
+            <li><h3>FOOTER</h3></li>
+            <li><a href="https://cloud.google.com/" 
+                role="button"><h1>GCP</h1></a></li>
+            <li><a href="https://firebase.google.com/" 
+                role="button"><H1>Firebase</H1></a></li>
+            <li><a href="https://lokaverkefni-2024.web.app/" 
+                role="button"><H2>Höfundur</H2></a></li>
+        </ul>
+    </footer>
+</html>
