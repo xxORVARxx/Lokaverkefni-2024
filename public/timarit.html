@@ -663,7 +663,7 @@
             .addLayer('hugtok', _C.purple, 0.0, 0.55); // 21
 
         ldM.addLabel('Undirbúa vörn', '', false)
-            .setDuration('vorn', _C.purple, 9.0, 1.0)
+            .setDuration('vorn', _C.kellyGreen, 9.0, 1.0)
             .addLayer('vorn', _C.purple, 6.0+_DAY(4), 2.0);
 
         ldM.setReferencesNumber(1);
@@ -678,7 +678,7 @@
         eM.add(6.0+_DAY(4), 'gray', "IEEE heimildanotkun fyrirlestur", "Fyrirlestur frá skólanum um IEEE heimildanotkun (26. janúar - 1 klst 12:00-13:00)."); // 26jan/04+4
         eM.add(9.0,        'green', "Fyrri áfangaskil", "Vera búinn að vinna í gegnum kaflana í meginmáli (12. febrúar)."); // 12feb/07+0
         eM.add(12.0,       'green', "Seinni áfangaskil", "Fræðin og undirbúningur fyrir úrvinnslu á mælingum og/eða gögnum á að liggja að mestu fyrir í skýrslunni (04. mars)."); // 04mar/10+0
-        eM.add(13.0,         'red', "Miðannarvörn á seinni skilum", "Kynning + powerpoint og spurningar frá kennara (11. mars - 15. mars )."); // 11mar/11+0
+        eM.add(13.0,        'blue', "Miðannarvörn á seinni skilum", "Kynning + powerpoint og spurningar frá kennara (11. mars - 15. mars )."); // 11mar/11+0
         eM.add(19.0,         'red', "Lokaskil", "Lokaskil, hér á skýslan að vera full búin (22. apríl)."); // 22apr/17+0
         eM.add(21.0+_DAY(4), 'red', "Varnir á lokaverkefni", "Varnir á lokaverkefni, upplýsingar koma seinna (miðjan maí)."); // 10maí/19+4
         eM.add(22.0+_DAY(2), 'red', "Skil á skýrslu inn á skemma.is", "Skil á skýrslu inn á skemma.is eftir vörn, áfanga lokið!"); // 15maí/20+2
@@ -760,9 +760,11 @@
         eM.getTexts().forEach(function(text, i){
             if(text){
                 const node = document.createElement('span');
-                i <= 5 ? 
+                i <= 6 ? 
                     node.classList.add("borderGreen") : 
-                    node.classList.add("borderNone");
+                    i <= 7 ?
+                        node.classList.add("borderBlue") :
+                        node.classList.add("borderNone");
                 const textnode = document.createTextNode(text);
                 node.appendChild(textnode);
                 nodeSkil.appendChild(node);
