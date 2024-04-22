@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lokaverkefni-2024</title>
+    <!--Internal CSS style sheet:-->
+    <style>
+      html, body {
+        margin: 0;
+        height: 100%;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      body > footer {
+        position: sticky;
+        top: 100vh;
+      }
+      body > header, body > footer {
+        background-color: #c1d9bd;
+      }
+      body > header, body > footer, body > main {
+        display: flex; gap: 5vw;
+        justify-content: space-between;
+        padding-left: 5vw; padding-right: 5vw;
+      }
+      body > main > * {
+        transition: margin 0.75s linear;
+        max-width: 33vw;
+      }
+
+      input[type=text], input[type=email], input[type=password], span {
+        background-color: white;
+        width: 100%;
+        display: inline-block;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+      }
+      button, .button {
+        background-color: #04AA6D;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        opacity: 0.8;
+      }
+
+      .modal {
+        height: auto;
+        width: 100%;
+        background-color: #eefcec;
+        border: 1px solid #888;
+      }
+      .modal > span {
+        white-space: nowrap;
+      }
+      .modal var {
+        position: absolute;
+        right: 20px;
+      }
+      .container {
+        position: relative;
+        padding: 14px 20px;
+        margin-top: 8px; margin-bottom: 8px;
+      }
+      .ex-container{/* Supposed to be empty. */}
+
+      @keyframes fade-out {
+        from {transform: scale(1); opacity: 100%; width: 100%; height: 100%;}
+        to {transform: scale(0); opacity: 0%; width: 0px; height: 0px;}
+      }
+      @keyframes fade-in {
+        from {transform: scale(0); opacity: 0%; width: 0px; height: 0px;} 
+        to {transform: scale(1); opacity: 100%; width: 100%; height: 100%;}
+      }
+      @-webkit-keyframes fade-out {
+        from {transform: scale(1); opacity: 100%; width: 100%; height: 100%;}
+        to {transform: scale(0); opacity: 0%; width: 0px; height: 0px;}
+      }
+      @-webkit-keyframes fade-in {
+        from {transform: scale(0); opacity: 0%; width: 0px; height: 0px;} 
+        to {transform: scale(1); opacity: 100%; width: 100%; height: 100%;}
+      }
+    </style>
+    <!--internal JS script:-->
+    <script type="module">
+      import { 
+        initializeApp 
+      } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
+      import { 
+        getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut 
+      } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js';
+      import { 
+        getFirestore, doc, onSnapshot 
+      } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
+      const firebaseConfig = {
+        apiKey: "AIzaSyBbEDMXiSKcnmKeUwjkbXDblbUVi3TPdGc",
+        authDomain: "svg-test-v1.firebaseapp.com",
+        projectId: "svg-test-v1",
+        storageBucket: "svg-test-v1.appspot.com",
+        messagingSenderId: "523877460836",
+        appId: "1:523877460836:web:0b6aaf84d2635a5030a871",
+        measurementId: "G-4JVKQ19Y41"
+      };
+      const gApp = initializeApp(firebaseConfig);
+      const auth = getAuth();
+      const db = getFirestore(gApp);
+      const login = document.querySelector("#id_login");
+      const logout = document.querySelector("#id_logout");
+      const mainTag = document.querySelector("main");
+
+      window.f_fadeIn = (tag = null, id = null) => {
+        tag = tag ? tag : document.getElementById(id);
+        tag.style.animation = "fade-in 0.75s forwards linear";
+        tag.classList.replace("ex-container", "container");
+      };
+      window.f_fadeOut = (tag = null, id = null) => {
+        tag = tag ? tag : document.getElementById(id);
+        tag.style.animation = "fade-out 0.75s forwards linear";
+        tag.classList.replace("container", "ex-container");
+      }
+      window.f_signOutUser = () => {
+        window.f_fadeOut(logout);
+        signOut(auth).then(() => {
+          console.log("++ You have successfully logged out!");
+        }).catch((error) => {
+          console.error("++", {error});
+          window.f_fadeIn(logout);
+        });
+      }
+      window.f_swap = () => {
+        mainTag.lastElementChild.style.marginLeft = "0px";
+        window.f_fadeIn(mainTag.lastElementChild);
+        mainTag.insertBefore(mainTag.lastElementChild, mainTag.children[1]);
+        mainTag.lastElementChild.style.marginLeft = "-5vw";
+        window.f_fadeOut(mainTag.lastElementChild);
+      }
+
+      let counter = 1;
+      function f_presentData(str, ISO, data){
+        let tags = mainTag.lastElementChild.querySelectorAll("span");
+        tags.forEach((span, i) => {
+          span.firstElementChild.innerHTML = 
+            data.length > i ? data[i] : "Vanskila...";
+        });
+        let d, t;
+        [d, t] = ISO.split('Z')[0].split('T');
+        console.log("++", d, " ++", t);
+        tags = tags[0].previousElementSibling;
+        tags.innerHTML = t;
+        tags.previousSibling.nodeValue = d;
+        tags.previousElementSibling.innerHTML = str + counter++;
+      }
+
+      function f_hexToBytes(hexStr){
+        let arr = [];
+        for (let i = 0; i < hexStr.length; i += 2) {
+            arr.push(parseInt(hexStr.substr(i, 2), 16));
+        }
+        return new Uint8Array(arr);
+      }
+      function f_bytesToHex(byteArr){
+        let str = '';
+        for (let i = 0; i < byteArr.length; i++) {
+            str += ('0' + (byteArr[i] & 0xFF).toString(16)).slice(-2);
+        }
+        return str.toUpperCase();
+      }
+
+      let unsub = null;
+      function f_loadBD(){
+        unsub = onSnapshot(doc(db, "test", "hex"), (doc) => {
+          const d = doc.data();
+          const date = new Date();
+          date.setTime(
+            (d.createTime.seconds * 1000) + (d.createTime.nanoseconds * 0.000001)
+          );
+          console.log("++ Received data: ", d.tags);
+          f_presentData("Aðsent gögn ", date.toISOString(), f_hexToBytes(d.tags));
+          f_swap();
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        auth.onAuthStateChanged((user) => {
+          if(user){
+            console.log("++ You have successfully logged in!", user.uid);
+            window.f_fadeIn(logout); window.f_fadeOut(login);
+            logout.querySelector("h4").innerHTML = user.email;
+            f_loadBD();
+          }
+          else{
+            window.f_fadeIn(login); window.f_fadeOut(logout);
+            if(unsub) {
+              unsub(); unsub = null;
+            }
+          }
+        });
+        login.addEventListener("submit", (e) => {
+          e.preventDefault();
+          window.f_fadeOut(login);
+          const email = login["id_email"].value;
+          const password = login["id_password"].value;
+          signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+              console.log("++", {userCredential});
+              login.reset();
+            })
+            .catch((error) => {
+              console.error("++", {error});
+              window.f_fadeIn(login);
+            });
+        });
+      });
+      window.f_simulateDataReceive = (len) => {
+        const bytes = Array.from({length: len}, () => 
+          Math.floor(Math.random() * 256));
+        const hex = f_bytesToHex(bytes);
+        console.log("++ Simulated data: ", hex);
+        f_presentData("Gervi gögn ", new Date().toISOString(), f_hexToBytes(hex));
+        f_swap();
+      }
+    </script>
+  </head>
+  <body>
+    <header>
+      <button style="width: auto;" class="container" 
+        onclick="f_simulateDataReceive(8)">Herma aðsent gögn</button>
+      <h3>Lokaverkefni 2024</h3>
+      <a style="width: auto;" class="button container" 
+        href="https://lokaverkefni-2024.web.app/">Sjá meira</a>
+    </header>
+
+    <main style="padding-top: 3%;">
+
+      <div class="modal container">
+        <form id="id_login" style="animation: fade-out 0s forwards;">
+          <h3>Innskráning</h3>
+          <label for="uname"><b>Netfang</b></label>
+          <input id="id_email" class="container" 
+            type="email" placeholder="Netfang" name="uname" required>
+
+          <label for="psw"><b>Lykilorð</b></label>
+          <input id="id_password" class="container" 
+            type="password" placeholder="Lykilorð" name="psw" required>
+          <button style="width: 100%;" class="container" 
+            type="submit">Login</button>
+        </form>
+        <div id="id_logout" style="animation: fade-out 0s forwards;">
+          <h3 style="margin-top: -0.72px;">Velkomin</h3>
+          <h4 style="margin-bottom: 60px;">@</h4>
+          <button style="width: 100%;" class="container" 
+            onclick="f_signOutUser()">Útskráning</button>
+        </div>
+      </div>
+
+      <div class="modal container" style="animation: fade-out 0s forwards;">
+        <h3>Data </h3>..date<var>..time</var>
+        <span class="container"> Byte 0 <var>..value</var></span>
+        <span class="container"> Byte 1 <var>..value</var></span>
+        <span class="container"> Byte 2 <var>..value</var></span>
+        <span class="container"> Byte 3 <var>..value</var></span>
+        <span class="container"> Byte 4 <var>..value</var></span>
+        <span class="container"> Byte 5 <var>..value</var></span>
+        <span class="container"> Byte 6 <var>..value</var></span>
+        <span class="container"> Byte 7 <var>..value</var></span>
+      </div>
+
+      <div class="modal container" style="animation: fade-out 0s forwards;">
+        <h3>Data </h3>..date<var>..time</var>
+        <span class="container"> Byte 0 <var>..value</var></span>
+        <span class="container"> Byte 1 <var>..value</var></span>
+        <span class="container"> Byte 2 <var>..value</var></span>
+        <span class="container"> Byte 3 <var>..value</var></span>
+        <span class="container"> Byte 4 <var>..value</var></span>
+        <span class="container"> Byte 5 <var>..value</var></span>
+        <span class="container"> Byte 6 <var>..value</var></span>
+        <span class="container"> Byte 7 <var>..value</var></span>
+      </div>
+
+      <div class="modal container" style="animation: fade-out 0s forwards;">
+        <h3>Data </h3>..date<var>..time</var>
+        <span class="container"> Byte 0 <var>..value</var></span>
+        <span class="container"> Byte 1 <var>..value</var></span>
+        <span class="container"> Byte 2 <var>..value</var></span>
+        <span class="container"> Byte 3 <var>..value</var></span>
+        <span class="container"> Byte 4 <var>..value</var></span>
+        <span class="container"> Byte 5 <var>..value</var></span>
+        <span class="container"> Byte 6 <var>..value</var></span>
+        <span class="container"> Byte 7 <var>..value</var></span>
+      </div>
+
+    </main>
+    <footer style="min-height: 100px;">
+      <h3>HR ◌ Iðn- og tæknifræðideild</h3>
+      <h3>Örvar Sigþórsson</h3>
+    </footer>
+  </body>
+</html>
