@@ -19,13 +19,15 @@
     <!-- JavaScript code below -->
     <script type="text/javascript">
       function f_rotate(byte){
-        const path = document.querySelector("#id_color");
-        byte > 180 ? path.style.fill="red" : path.style.fill="black";
-      }
-      function f_color(byte){
         const r = Math.min(Math.max(byte, 1), 255) / 255
         const path = document.querySelector("#id_rotate");
         path.style.transform = `rotate(${ r * 225 }deg)`;
+      }
+      function f_color(byte){
+        const path = document.querySelector("#id_color");
+        byte > 200 ? path.style.fill="red" 
+          : byte > 120 ? path.style.fill="orange" 
+            : path.style.fill="green";
       }
       function f_update(){
         // Adjust the NodeJS's URL if necessary:
@@ -57,7 +59,7 @@
         c 16.2,0 31,-9.2 38.2,-23.7
         a 422,422 0 0 0 45,-190
         c 0,-235.3 -191.4,-426.7 -426.7,-426.6 z"></path> 
-      <path id="id_rotate" fill="#FFF" d="M -290,125 -38.2,-53
+      <path id="id_rotate" fill="white" d="M -290,125 -38.2,-53
         A 65.3,65.3 0 0 1 52.8,-37.3 65.3,65.3 0 0 1 12.8,64.3 Z"></path>
     </svg> 
   </body>
