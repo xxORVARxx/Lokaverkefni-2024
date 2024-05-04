@@ -42,7 +42,7 @@
         border: none;
         cursor: pointer;
       }
-      button:hover {
+      button:hover, .button:hover {
         opacity: 0.8;
       }
 
@@ -179,7 +179,7 @@
               (d.createTime.seconds * 1000) + (d.createTime.nanoseconds * 0.000001)
             );
             console.log("++ Received data: ", d.tags);
-            f_presentData("Aðsent gögn ", date.toISOString(), f_hexToBytes(d.tags));
+            f_presentData("Aðsend gögn ", date.toISOString(), f_hexToBytes(d.tags));
             f_swap();
           });
         }
@@ -226,7 +226,7 @@
   <body onbeforeunload="f_signOutUser()">
     <header>
       <button style="width: auto;" class="container" 
-        onclick="f_simulateDataReceive(8)">Herma aðsent gögn</button>
+        onclick="f_simulateDataReceive(8)">Herma aðsend gögn</button>
       <h3>Lokaverkefni 2024</h3>
       <a style="width: auto;" class="button container" 
         href="https://lokaverkefni-2024.web.app/">Sjá meira</a>
